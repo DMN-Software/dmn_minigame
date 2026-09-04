@@ -11,20 +11,23 @@ einem iframe eingebunden. Dieselbe Seite ist im normalen Browser spielbar.
 
 ## Die Spiele
 
+Die Namen lehnen sich an bekannte Vorbilder an, sind aber bewusst nicht deren Namen — mehrere
+davon sind eingetragene Marken.
+
 | Spiel | Steuerung | Technik |
 |---|---|---|
-| Snake | Richtungstasten, Wischen | Canvas |
-| Flappy Bird | Tippen | Canvas |
-| Tic-Tac-Toe | Klicken | DOM |
-| Tower Stack | Tippen | Canvas |
+| Snaker | Richtungstasten, Wischen | Canvas |
+| Flapper | Tippen | Canvas |
+| Tick Tack Toe | Klicken | DOM |
+| Stacker | Tippen | Canvas |
 | 2048 | Richtungstasten, Wischen | DOM |
-| Breakout | Zeiger, Richtungstasten | Canvas |
-| Minesweeper | Klicken, langer Druck für Flagge | DOM |
-| Memory | Klicken | DOM |
-| Tetris | Richtungstasten | Canvas |
-| Pong | Zeiger, Richtungstasten | Canvas |
-| Simon Says | Klicken | DOM |
-| Doodle Jump | Richtungstasten | Canvas |
+| Brickout | Zeiger, Richtungstasten | Canvas |
+| Minefinder | Klicken, langer Druck für Flagge | DOM |
+| Memoria | Klicken | DOM |
+| Blockris | Richtungstasten | Canvas |
+| Pongo | Zeiger, Richtungstasten | Canvas |
+| Sim Says | Klicken | DOM |
+| Doodle Hop | Richtungstasten | Canvas |
 
 ## Aufbau
 

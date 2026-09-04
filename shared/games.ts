@@ -21,19 +21,21 @@ export type GameMeta = {
     scheme: Scheme
 }
 
+// angelehnt an die vorbilder, aber bewusst nicht deren namen: tetris, memory, pong,
+// breakout und simon sind eingetragene marken, und das repo ist oeffentlich
 export const GAMES: GameMeta[] = [
-    { id: 'snake', title: 'Snake', hint: 'Sammeln, ohne dich selbst zu treffen', scheme: 'dpad' },
-    { id: 'flappy', title: 'Flappy Bird', hint: 'Tippen hält dich oben', scheme: 'tap' },
-    { id: 'tictactoe', title: 'Tic-Tac-Toe', hint: 'Gegen den Rechner, drei in einer Reihe', scheme: 'pointer' },
-    { id: 'tower', title: 'Tower Stack', hint: 'Blöcke stapeln, der Überstand fällt ab', scheme: 'tap' },
+    { id: 'snake', title: 'Snaker', hint: 'Sammeln, ohne dich selbst zu treffen', scheme: 'dpad' },
+    { id: 'flappy', title: 'Flapper', hint: 'Tippen hält dich oben', scheme: 'tap' },
+    { id: 'tictactoe', title: 'Tick Tack Toe', hint: 'Gegen den Rechner, drei in einer Reihe', scheme: 'pointer' },
+    { id: 'tower', title: 'Stacker', hint: 'Blöcke stapeln, der Überstand fällt ab', scheme: 'tap' },
     { id: 'g2048', title: '2048', hint: 'Gleiche Zahlen zusammenschieben', scheme: 'dpad' },
-    { id: 'breakout', title: 'Breakout', hint: 'Alle Steine mit dem Ball abräumen', scheme: 'paddle' },
-    { id: 'minesweeper', title: 'Minesweeper', hint: 'Felder aufdecken, Minen markieren', scheme: 'pointer' },
-    { id: 'memory', title: 'Memory', hint: 'Gleiche Karten finden', scheme: 'pointer' },
-    { id: 'tetris', title: 'Tetris', hint: 'Reihen füllen und auflösen', scheme: 'dpad' },
-    { id: 'pong', title: 'Pong', hint: 'Erster auf elf Punkte gewinnt', scheme: 'paddle' },
-    { id: 'simon', title: 'Simon Says', hint: 'Die Folge nachklicken, sie wird länger', scheme: 'pointer' },
-    { id: 'doodle', title: 'Doodle Jump', hint: 'Von Plattform zu Plattform nach oben', scheme: 'dpad' },
+    { id: 'breakout', title: 'Brickout', hint: 'Alle Steine mit dem Ball abräumen', scheme: 'paddle' },
+    { id: 'minesweeper', title: 'Minefinder', hint: 'Felder aufdecken, Minen markieren', scheme: 'pointer' },
+    { id: 'memory', title: 'Memoria', hint: 'Gleiche Karten finden', scheme: 'pointer' },
+    { id: 'tetris', title: 'Blockris', hint: 'Reihen füllen und auflösen', scheme: 'dpad' },
+    { id: 'pong', title: 'Pongo', hint: 'Erster auf elf Punkte gewinnt', scheme: 'paddle' },
+    { id: 'simon', title: 'Sim Says', hint: 'Die Folge nachklicken, sie wird länger', scheme: 'pointer' },
+    { id: 'doodle', title: 'Doodle Hop', hint: 'Von Plattform zu Plattform nach oben', scheme: 'dpad' },
 ]
 
 export const GAME_IDS = GAMES.map((g) => g.id)
