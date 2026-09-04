@@ -1,4 +1,8 @@
-export type Dir = 'up' | 'down' | 'left' | 'right'
+import { BIT, randInt, type Input, type Rng, type Sim } from '../engine.ts'
+
+export const SIZE = 4
+
+type Dir = 'up' | 'down' | 'left' | 'right'
 
 export type Tile = {
     id: number
@@ -7,11 +11,13 @@ export type Tile = {
     value: number
     born: boolean
     merged: boolean
-    /** geschluckte kachel. faehrt den zug noch mit und liegt danach unter der neuen. */
+    // geschluckte kachel. faehrt den zug noch mit und liegt danach unter der neuen.
     gone: boolean
 }
 
-export const SIZE = 4
+export type G2048Sim = Sim & {
+    tiles: Tile[]
+}
 
 function buildOrder(): Record<Dir, number[][]> {
     const rows: number[][] = []
@@ -36,30 +42,15 @@ function buildOrder(): Record<Dir, number[][]> {
 
 const ORDER = buildOrder()
 
-let seq = 0
-
-function make(x: number, y: number, value: number): Tile {
-    seq += 1
-    return { id: seq, x, y, value, born: true, merged: false, gone: false }
+function heading(pressed: number): Dir | null {
+    if (pressed & BIT.left) return 'left'
+    if (pressed & BIT.right) return 'right'
+    if (pressed & BIT.up) return 'up'
+    if (pressed & BIT.down) return 'down'
+    return null
 }
 
-export function spawn(tiles: Tile[]): Tile[] {
-    const taken = new Set<number>()
-    for (const t of tiles) if (!t.gone) taken.add(t.y * SIZE + t.x)
-
-    const free: number[] = []
-    for (let i = 0; i < SIZE * SIZE; i++) if (!taken.has(i)) free.push(i)
-    if (!free.length) return tiles
-
-    const at = free[Math.floor(Math.random() * free.length)]
-    return tiles.concat(make(at % SIZE, Math.floor(at / SIZE), Math.random() < 0.9 ? 2 : 4))
-}
-
-export function start(): Tile[] {
-    return spawn(spawn([]))
-}
-
-export function move(tiles: Tile[], dir: Dir): { tiles: Tile[]; gained: number; moved: boolean } {
+function move(tiles: Tile[], dir: Dir): { tiles: Tile[]; gained: number; moved: boolean } {
     const byCell = new Map<number, Tile>()
     for (const t of tiles) if (!t.gone) byCell.set(t.y * SIZE + t.x, t)
 
@@ -99,7 +90,7 @@ export function move(tiles: Tile[], dir: Dir): { tiles: Tile[]; gained: number; 
     return { tiles: out, gained, moved }
 }
 
-export function canMove(tiles: Tile[]): boolean {
+function canMove(tiles: Tile[]): boolean {
     const grid = new Map<number, number>()
     for (const t of tiles) if (!t.gone) grid.set(t.y * SIZE + t.x, t.value)
     if (grid.size < SIZE * SIZE) return true
@@ -112,4 +103,64 @@ export function canMove(tiles: Tile[]): boolean {
         }
     }
     return false
+}
+
+export function create2048(rng: Rng): G2048Sim {
+    let seq = 0
+    let score = 0
+    let over = false
+    let rev = 0
+
+    function spawn(tiles: Tile[]): Tile[] {
+        const taken = new Set<number>()
+        for (const t of tiles) if (!t.gone) taken.add(t.y * SIZE + t.x)
+
+        const free: number[] = []
+        for (let i = 0; i < SIZE * SIZE; i++) if (!taken.has(i)) free.push(i)
+        if (!free.length) return tiles
+
+        const at = free[randInt(rng, free.length)]
+        seq += 1
+        return tiles.concat({
+            id: seq,
+            x: at % SIZE,
+            y: Math.floor(at / SIZE),
+            value: rng() < 0.9 ? 2 : 4,
+            born: true,
+            merged: false,
+            gone: false,
+        })
+    }
+
+    let tiles = spawn(spawn([]))
+
+    return {
+        get tiles() {
+            return tiles
+        },
+        get score() {
+            return score
+        },
+        get over() {
+            return over
+        },
+        get rev() {
+            return rev
+        },
+
+        step(input: Input) {
+            if (over) return
+
+            const dir = heading(input.pressed)
+            if (!dir) return
+
+            const res = move(tiles, dir)
+            if (!res.moved) return
+
+            tiles = spawn(res.tiles)
+            score += res.gained
+            rev += 1
+            if (!canMove(tiles)) over = true
+        },
+    }
 }

@@ -1,3 +1,5 @@
+import { randInt, type Rng } from '../engine.ts'
+
 export type Player = 'X' | 'O'
 export type Board = (Player | null)[]
 export type Result = { winner: Player | null; line: number[] }
@@ -46,10 +48,10 @@ function value(b: Board, turn: Player, depth: number): number {
     return out
 }
 
-export function aiMove(board: Board, slip: number): number {
+export function aiMove(rng: Rng, board: Board, slip: number): number {
     const free: number[] = []
     for (let i = 0; i < 9; i++) if (!board[i]) free.push(i)
-    if (Math.random() < slip) return free[Math.floor(Math.random() * free.length)]
+    if (rng() < slip) return free[randInt(rng, free.length)]
 
     const work = board.slice()
     let top = -Infinity
@@ -66,5 +68,5 @@ export function aiMove(board: Board, slip: number): number {
             picks.push(i)
         }
     }
-    return picks[Math.floor(Math.random() * picks.length)]
+    return picks[randInt(rng, picks.length)]
 }

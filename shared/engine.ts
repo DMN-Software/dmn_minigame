@@ -19,28 +19,22 @@ export const BIT: Record<Action, number> = {
 }
 
 export type Input = {
-    /** bitmaske der gehaltenen aktionen */
     held: number
-    /** was in genau diesem tick dazugekommen ist */
+    // nur was in genau diesem tick dazugekommen ist
     pressed: number
-    /**
-     * spielabhaengiger diskreter kanal, gilt nur fuer diesen tick, sonst -1.
-     * klickspiele legen hier das gewaehlte feld ab, schlaegerspiele die zielposition
-     * in tausendsteln - die schreiben aber hoechstens jeden vierten tick, sonst
-     * blaeht dauernde mausbewegung das protokoll auf.
-     */
+    // spielabhaengiger kanal, gilt nur fuer diesen tick, sonst -1. klickspiele legen hier
+    // das gewaehlte feld ab, schlaegerspiele die zielposition in tausendsteln - die aber
+    // hoechstens jeden vierten tick, sonst blaeht dauernde mausbewegung das protokoll auf.
     pick: number
 }
 
 export type Sim = {
     step(input: Input): void
-    readonly score: number
-    readonly over: boolean
-    /**
-     * zaehlt hoch, sobald sich sichtbar etwas geaendert hat. nur die dom-spiele brauchen
-     * das, damit react nicht jeden tick neu rendert - die wiederholung ignoriert es.
-     */
-    readonly rev?: number
+    score: number
+    over: boolean
+    // zaehlt hoch, sobald sich sichtbar etwas geaendert hat. nur die dom-spiele brauchen
+    // das, damit react nicht jeden tick neu rendert, die wiederholung ignoriert es.
+    rev?: number
 }
 
 export type Rng = () => number
@@ -73,11 +67,8 @@ export function shuffle<T>(rng: Rng, items: T[]): T[] {
     return out
 }
 
-/**
- * Flache Liste aus Tripeln [tick, held, pick]. Ein Eintrag entsteht nur, wenn sich die
- * gehaltenen Aktionen aendern oder ein Feld gewaehlt wird - ein Lauf ueber Minuten bleibt
- * damit ein paar hundert Zahlen gross.
- */
+// tripel [tick, held, pick]. ein eintrag entsteht nur bei einer aenderung, ein lauf ueber
+// minuten bleibt damit ein paar hundert zahlen gross.
 export type Log = number[]
 
 export class Recorder {

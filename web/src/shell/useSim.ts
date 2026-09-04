@@ -6,18 +6,15 @@ import type { Controls, GameProps } from './types.ts'
 type Options<T extends Sim> = {
     create: (rng: Rng) => T
     props: GameProps
-    /** canvas-spiele zeichnen hier, dom-spiele lassen es weg und rendern aus sim.rev */
+    // canvas-spiele zeichnen hier, dom-spiele lassen beides weg und rendern aus sim.rev
     canvas?: RefObject<HTMLCanvasElement | null>
     draw?: (ctx: CanvasRenderingContext2D, sim: T) => void
-    /** was in diesem tick im pick-kanal steht. standard ist die anstehende feldwahl. */
+    // was in diesem tick im pick-kanal steht, standard ist die anstehende feldwahl
     sample?: (controls: Controls, tick: number) => number
 }
 
-/**
- * Treibt die Simulation mit festem Zeitschritt und schreibt dabei das Eingabeprotokoll mit.
- * Nur was hier hineinlaeuft, kann der Server nachspielen - ein Spiel darf seinen Zustand
- * deshalb ausschliesslich ueber step() aendern.
- */
+// nur was hier ins protokoll laeuft, kann der server nachspielen. ein spiel darf seinen
+// zustand deshalb ausschliesslich ueber step() aendern.
 export function useSim<T extends Sim>({ create, props, canvas, draw, sample }: Options<T>) {
     const { seed, paused, controls, onScore, onGameOver } = props
 

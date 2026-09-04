@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import { SIZE, canMove, move, spawn, start, type Dir, type Tile } from './board.ts'
-import type { Action, GameProps } from '../../shell/types.ts'
+import { SIZE, create2048, type Tile } from '../../../../shared/games/g2048.ts'
+import { useSim } from '../../shell/useSim.ts'
 import { useSquare } from '../../shell/useSquare.ts'
+import type { GameProps } from '../../shell/types.ts'
 import './g2048.css'
 
 const SLOTS = Array.from({ length: SIZE * SIZE }, (_, i) => i)
-
-function isDir(a: Action): a is Dir {
-    return a === 'up' || a === 'down' || a === 'left' || a === 'right'
-}
 
 function fontScale(value: number): number {
     if (value < 100) return 0.44
@@ -23,35 +19,9 @@ function faceClass(t: Tile): string {
     return cls
 }
 
-export default function G2048({ paused, controls, onScore, onGameOver }: GameProps) {
-    const [tiles, setTiles] = useState<Tile[]>(start)
+export default function G2048(props: GameProps) {
+    const sim = useSim({ create: create2048, props })
     const [area, size] = useSquare(380)
-    const score = useRef(0)
-    const dead = useRef(false)
-
-    // die eingabe haengt nicht am render, deshalb liest sie den stand aus dem ref
-    const live = useRef(tiles)
-    live.current = tiles
-
-    useEffect(() => {
-        return controls.on((a) => {
-            if (paused || dead.current || !isDir(a)) return
-
-            const step = move(live.current, a)
-            if (!step.moved) return
-
-            const next = spawn(step.tiles)
-            live.current = next
-            setTiles(next)
-            score.current += step.gained
-            onScore(score.current)
-
-            if (!canMove(next)) {
-                dead.current = true
-                onGameOver(score.current)
-            }
-        })
-    }, [controls, paused, onScore, onGameOver])
 
     const gap = Math.max(4, Math.round(size * 0.022))
     const cell = (size - gap * (SIZE + 1)) / SIZE
@@ -72,7 +42,7 @@ export default function G2048({ paused, controls, onScore, onGameOver }: GamePro
                     />
                 ))}
 
-                {tiles.map((t) => (
+                {sim.tiles.map((t) => (
                     <div
                         key={t.id}
                         className={t.gone ? 'g2048__tile g2048__tile--gone' : 'g2048__tile'}
