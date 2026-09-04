@@ -1,0 +1,59 @@
+.ttt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.ttt__status {
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.ttt__streak {
+    font-family: var(--mono);
+    color: var(--text);
+}
+
+.ttt__area {
+    display: grid;
+    place-items: center;
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ttt__board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.ttt__board .ttt__cell {
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1;
+    color: var(--text-faint);
+    cursor: pointer;
+}
+
+.ttt__board .ttt__cell:disabled {
+    cursor: default;
+}
+
+.ttt__cell--x { color: var(--p1); }
+.ttt__cell--o { color: var(--p2); }
+
+.ttt__cell--win {
+    border-color: currentColor;
+    background: var(--bg-sunken);
+}

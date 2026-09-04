@@ -1,0 +1,17 @@
+FROM node:24-alpine
+WORKDIR /app
+
+COPY api/package.json api/package-lock.json ./api/
+RUN cd api && npm ci --omit=dev
+
+# gleiches layout wie im repo, sonst zeigt ../../shared aus api/src ins leere
+COPY shared/ ./shared/
+COPY api/ ./api/
+
+# leeres named volume erbt besitzer und rechte von diesem verzeichnis
+RUN mkdir -p /data && chown node:node /data
+USER node
+
+ENV NODE_ENV=production
+EXPOSE 8090
+CMD ["node", "api/src/index.ts"]

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8" />
+        <title>Einbettung prüfen</title>
+        <style>
+            body { margin: 0; padding: 16px; background: #1a1a1a; color: #ddd;
+                   font: 14px system-ui, sans-serif; }
+            h1 { font-size: 16px; margin: 0 0 4px; }
+            p { margin: 0 0 16px; color: #999; }
+            .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+            figure { margin: 0; }
+            figcaption { margin-bottom: 4px; color: #999; font-size: 12px; }
+            iframe { border: 1px solid #444; background: #0d1014; }
+            .full iframe { width: 90vw; height: 70vh; }
+        </style>
+    </head>
+    <body>
+        <h1>Einbettung prüfen</h1>
+        <p>
+            Pfeiltasten dürfen diese Seite nicht scrollen. Klick ins iframe: Tastatur wirkt.
+            Klick daneben: das Spiel pausiert.
+        </p>
+
+        <div class="row">
+            <figure>
+                <figcaption>320 × 240, kiosk, ohne Bestenliste</figcaption>
+                <iframe src="/?kiosk=1&game=snake&board=0" width="320" height="240"></iframe>
+            </figure>
+            <figure>
+                <figcaption>480 × 360</figcaption>
+                <iframe src="/?game=tetris" width="480" height="360"></iframe>
+            </figure>
+            <figure>
+                <figcaption>800 × 600, Menü</figcaption>
+                <iframe src="/" width="800" height="600"></iframe>
+            </figure>
+        </div>
+
+        <div class="row full" style="margin-top: 16px">
+            <figure>
+                <figcaption>füllend</figcaption>
+                <iframe src="/?game=breakout&pad=1"></iframe>
+            </figure>
+        </div>
+    </body>
+</html>

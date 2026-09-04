@@ -1,0 +1,90 @@
+.mine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.mine__status {
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-faint);
+}
+
+.mine__count {
+    font-family: var(--mono);
+    color: var(--text-dim);
+}
+
+.mine__area {
+    display: grid;
+    place-items: center;
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.mine__board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    gap: 3px;
+    user-select: none;
+    touch-action: none;
+}
+
+.mine__cell {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg-raised);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: inherit;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .1s;
+}
+
+.mine__cell:active { transform: scale(.94); }
+
+.mine__cell--open {
+    border-color: var(--line-soft);
+    background: var(--bg-sunken);
+    cursor: default;
+}
+
+.mine__cell--boom { background: #3b1517; }
+
+.mine__flag {
+    width: 40%;
+    height: 40%;
+    border-radius: 2px;
+    background: var(--warn);
+    transform: rotate(45deg);
+}
+
+.mine__bomb {
+    width: 44%;
+    height: 44%;
+    border-radius: 50%;
+    background: var(--bad);
+}
+
+.mine__n1 { color: var(--p2); }
+.mine__n2 { color: var(--p1); }
+.mine__n3 { color: var(--p3); }
+.mine__n4 { color: var(--p5); }
+.mine__n5 { color: var(--p4); }
+.mine__n6 { color: var(--p6); }
+.mine__n7 { color: var(--text); }
+.mine__n8 { color: var(--bad); }
