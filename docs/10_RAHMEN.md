@@ -13,9 +13,9 @@ zusätzlich alles öffentlich macht, was der Renderer zum Zeichnen braucht:
 ```ts
 type Sim = {
     step(input: Input): void
-    readonly score: number
-    readonly over: boolean
-    readonly rev?: number
+    score: number
+    over: boolean
+    rev?: number
 }
 
 type Input = {
@@ -29,7 +29,7 @@ type Input = {
 klickgesteuerten Spiele: React rendert sie neu, sobald der Zähler sich ändert, sonst würde
 jeder Tick ein Rendern auslösen.
 
-Der `pick`-Kanal trägt, was nicht in sechs Tastenbits passt. Bei Minenfeld ist das
+Der `pick`-Kanal trägt, was nicht in sechs Tastenbits passt. Bei Minesweeper ist das
 `feldIndex * 2` zum Aufdecken und `feldIndex * 2 + 1` zum Flaggen, bei den Schlägerspielen die
 Zielposition in Tausendsteln der Spielfeldbreite.
 
