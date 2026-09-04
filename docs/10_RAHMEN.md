@@ -29,7 +29,7 @@ type Input = {
 klickgesteuerten Spiele: React rendert sie neu, sobald der Zähler sich ändert, sonst würde
 jeder Tick ein Rendern auslösen.
 
-Der `pick`-Kanal trägt, was nicht in sechs Tastenbits passt. Bei Minesweeper ist das
+Der `pick`-Kanal trägt, was nicht in sechs Tastenbits passt. Bei Minefinder ist das
 `feldIndex * 2` zum Aufdecken und `feldIndex * 2 + 1` zum Flaggen, bei den Schlägerspielen die
 Zielposition in Tausendsteln der Spielfeldbreite.
 
