@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { COLS, MINES, blank, cleared, fill, flags, open, opened, showMines, toggleFlag, type Cell } from './field.ts'
-import type { GameProps } from '../../shell/types.ts'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { COLS, MINES, createMinesweeper, type Cell } from '../../../../shared/games/minesweeper.ts'
+import { useSim } from '../../shell/useSim.ts'
 import { useSquare } from '../../shell/useSquare.ts'
+import type { GameProps } from '../../shell/types.ts'
 import './minesweeper.css'
 
 const HOLD = 400
@@ -20,64 +21,30 @@ function face(c: Cell): ReactNode {
     return c.near > 0 ? c.near : null
 }
 
-export default function Minesweeper({ paused, onScore, onGameOver }: GameProps) {
-    const [cells, setCells] = useState<Cell[]>(blank)
-    const [boom, setBoom] = useState(-1)
-    const [dead, setDead] = useState(false)
+export default function Minesweeper(props: GameProps) {
+    const sim = useSim({ create: createMinesweeper, props })
     const [area, size] = useSquare(380)
-    const armed = useRef(false)
     const press = useRef(0)
     const skip = useRef(false)
 
     useEffect(() => () => window.clearTimeout(press.current), [])
 
-    const flag = (i: number) => {
-        if (paused || dead) return
-        setCells((prev) => toggleFlag(prev, i))
-    }
+    const busy = props.paused || sim.over
 
-    const dig = (i: number) => {
-        if (paused || dead) return
-
-        const base = armed.current ? cells : fill(cells, i)
-        armed.current = true
-        if (base[i].open || base[i].flag) {
-            setCells(base)
-            return
-        }
-
-        if (base[i].mine) {
-            const shown = showMines(base)
-            setCells(shown)
-            setBoom(i)
-            setDead(true)
-            onGameOver(opened(shown))
-            return
-        }
-
-        const next = open(base, i)
-        setCells(next)
-        const score = opened(next)
-        onScore(score)
-        if (cleared(next)) {
-            setDead(true)
-            onGameOver(score)
-        }
-    }
-
+    // gerade meldung deckt auf, ungerade setzt die flagge
     const down = (i: number, button: number) => {
-        if (button !== 0 || paused || dead) return
+        if (button !== 0 || busy) return
         skip.current = false
         press.current = window.setTimeout(() => {
             skip.current = true
-            flag(i)
+            props.controls.choose(i * 2 + 1)
         }, HOLD)
     }
 
     const up = (i: number) => {
         window.clearTimeout(press.current)
-        if (skip.current) return
-        dig(i)
+        if (skip.current || busy) return
+        props.controls.choose(i * 2)
     }
 
     const abort = () => {
@@ -85,7 +52,8 @@ export default function Minesweeper({ paused, onScore, onGameOver }: GameProps) 
         skip.current = true
     }
 
-    const left = MINES - flags(cells)
+    let left = MINES
+    for (const c of sim.cells) if (c.flag) left -= 1
     const cell = Math.floor(size / COLS)
 
     return (
@@ -100,11 +68,11 @@ export default function Minesweeper({ paused, onScore, onGameOver }: GameProps) 
                     className="mine__board"
                     style={{ width: size, height: size, fontSize: Math.round(cell * 0.55) }}
                 >
-                    {cells.map((c, i) => (
+                    {sim.cells.map((c, i) => (
                         <button
                             key={i}
                             type="button"
-                            className={cellClass(c, boom === i)}
+                            className={cellClass(c, sim.boom === i)}
                             onPointerDown={(e) => down(i, e.button)}
                             onPointerUp={() => up(i)}
                             onPointerLeave={abort}
@@ -113,9 +81,9 @@ export default function Minesweeper({ paused, onScore, onGameOver }: GameProps) 
                                 e.preventDefault()
                                 // beim halten auf dem touchscreen kommt contextmenu hinterher,
                                 // die flagge liegt dann schon
-                                if (skip.current) return
+                                if (skip.current || busy) return
                                 abort()
-                                flag(i)
+                                props.controls.choose(i * 2 + 1)
                             }}
                         >
                             {face(c)}

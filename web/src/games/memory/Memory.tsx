@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { createMemory } from '../../../../shared/games/memory.ts'
+import { useSim } from '../../shell/useSim.ts'
 import type { GameProps } from '../../shell/types.ts'
 import './memory.css'
-
-const HOLD = 700
 
 const MOTIVE = [
     { d: 'M12 3 L21.5 20.5 L2.5 20.5 Z', c: 'var(--p1)' },
@@ -15,71 +14,21 @@ const MOTIVE = [
     { d: 'M12 2.5 C18.5 8 18.5 16.5 12 21.5 C5.5 16.5 5.5 8 12 2.5 Z', c: 'var(--text)' },
 ]
 
-type Card = { id: number; sym: number }
-
-function deal(): Card[] {
-    const cards: Card[] = []
-    for (let sym = 0; sym < MOTIVE.length; sym++) {
-        cards.push({ id: sym * 2, sym }, { id: sym * 2 + 1, sym })
-    }
-    for (let i = cards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        const t = cards[i]
-        cards[i] = cards[j]
-        cards[j] = t
-    }
-    return cards
-}
-
-function points(pairs: number, misses: number) {
-    return Math.max(0, pairs * 100 - misses * 10)
-}
-
-export default function Memory({ paused, onScore, onGameOver }: GameProps) {
-    const [cards] = useState(deal)
-    const [open, setOpen] = useState<number[]>([])
-    const [found, setFound] = useState<number[]>([])
-    const [misses, setMisses] = useState(0)
-
-    // pausiert der host mitten im vergleich, laeuft die wartezeit danach neu an
-    useEffect(() => {
-        if (paused || open.length < 2) return
-
-        const hit = cards[open[0]].sym === cards[open[1]].sym
-        const t = window.setTimeout(() => {
-            setOpen([])
-            if (hit) {
-                const pairs = found.length + 1
-                setFound([...found, cards[open[0]].sym])
-                onScore(points(pairs, misses))
-                if (pairs === MOTIVE.length) onGameOver(points(pairs, misses))
-            } else {
-                setMisses(misses + 1)
-                onScore(points(found.length, misses + 1))
-            }
-        }, HOLD)
-
-        return () => clearTimeout(t)
-    }, [paused, open, cards, found, misses, onScore, onGameOver])
-
-    function flip(i: number) {
-        if (paused || open.length > 1) return
-        if (open.includes(i) || found.includes(cards[i].sym)) return
-        setOpen([...open, i])
-    }
+export default function Memory(props: GameProps) {
+    const sim = useSim({ create: createMemory, props })
 
     return (
         <div className="grid-game mem__board">
-            {cards.map((card, i) => {
-                const done = found.includes(card.sym)
-                const up = done || open.includes(i)
+            {sim.cards.map((card, i) => {
+                const done = sim.found.includes(card.sym)
+                const up = done || sim.open.includes(i)
                 const motive = MOTIVE[card.sym]
                 return (
                     <button
                         key={card.id}
                         type="button"
                         className={done ? 'mem__card mem__card--done' : 'mem__card'}
-                        onClick={() => flip(i)}
+                        onClick={() => props.controls.choose(i)}
                     >
                         <span className={up ? 'mem__inner mem__inner--up' : 'mem__inner'}>
                             <span className="mem__face mem__face--back" />

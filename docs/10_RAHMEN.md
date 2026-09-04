@@ -1,89 +1,111 @@
 # Rahmen
 
-Der Rahmen liegt in `web/src/shell/` und ist der Vertrag, gegen den jedes Spiel gebaut wird.
-Ein Spiel kennt weder die Bestenliste noch den Pause-Zustand der Seite noch die URL-Parameter.
+Jedes Spiel ist zweigeteilt: die Logik liegt als reine Simulation in `shared/games/`, das
+Zeichnen in `web/src/games/`. Der Grund steht in [20_API.md](20_API.md) — der Server spielt
+jeden Lauf mit derselben Logik nach und rechnet die Punktzahl selbst aus. Alles, was der
+Browser allein weiß, zählt nicht.
 
-## Was ein Spiel ist
+## Die Simulation
 
-Eine React-Komponente als Default-Export mit genau diesen Props:
+Eine Fabrikfunktion `create<Name>(rng: Rng)` liefert ein Objekt, das den Vertrag erfüllt und
+zusätzlich alles öffentlich macht, was der Renderer zum Zeichnen braucht:
 
 ```ts
-type GameProps = {
-    paused: boolean
-    controls: Controls
-    onScore: (score: number) => void
-    onGameOver: (score: number) => void
+type Sim = {
+    step(input: Input): void
+    readonly score: number
+    readonly over: boolean
+    readonly rev?: number
+}
+
+type Input = {
+    held: number      // bitmaske der gehaltenen aktionen
+    pressed: number   // was in genau diesem tick dazugekommen ist
+    pick: number      // spielabhaengiger kanal, sonst -1
 }
 ```
 
-- `onScore` aktualisiert nur die Anzeige. Der Host verwirft unveränderte Werte, ein Aufruf pro
-  Frame ist erlaubt.
-- `onGameOver` beendet den Lauf. Der Host lässt pro Lauf genau einen Aufruf durch, das Spiel
-  muss sich nicht selbst absichern — aber danach nichts mehr tun.
-- `paused` ist die einzige Wahrheit. Kein Spiel horcht selbst auf `visibilitychange` oder `blur`.
+`step` wird 60-mal je Sekunde gerufen, auch wenn nichts passiert. `rev` brauchen nur die
+klickgesteuerten Spiele: React rendert sie neu, sobald der Zähler sich ändert, sonst würde
+jeder Tick ein Rendern auslösen.
 
-Nach dem Ende bleibt das Spiel montiert und nur pausiert — ausgehängt wird es erst beim
-Neustart, wenn `run` hochzählt und `key={run}` wechselt. Jedes Spiel muss deshalb nach
-`onGameOver` von selbst stillhalten und im Rückgabewert seines `useEffect` aufräumen; die
-Canvas-Spiele setzen dafür ein `over`-Flag, das ihr Schritt oben abfragt.
+Der `pick`-Kanal trägt, was nicht in sechs Tastenbits passt. Bei Minenfeld ist das
+`feldIndex * 2` zum Aufdecken und `feldIndex * 2 + 1` zum Flaggen, bei den Schlägerspielen die
+Zielposition in Tausendsteln der Spielfeldbreite.
+
+## Bitgleich rechnen
+
+Der Server rechnet denselben Lauf noch einmal. Weicht auch nur ein Wert ab, scheitert die
+Wiederholung und der Spieler verliert seinen Eintrag. In `shared/games/` gilt deshalb:
+
+- Zufall ausschließlich über den übergebenen `rng` — `makeRng` ist ein mulberry32 aus
+  Ganzzahloperationen und einer Division, also überall gleich.
+- Keine Uhrzeit. Zeit wird in Ticks gezählt, 60 sind eine Sekunde. Aus einer Wartezeit von
+  700 ms werden 42 Ticks.
+- Keine transzendenten Funktionen. `Math.sin`, `cos`, `tan`, `atan2`, `pow`, `exp` und `log`
+  sind zwischen JavaScript-Engines nicht bitgleich, und der Spieler kann Firefox benutzen,
+  während der Server auf V8 läuft. Erlaubt sind die Grundrechenarten, `sqrt`, `floor`, `ceil`,
+  `round`, `abs`, `min`, `max` und `imul`. Abprallwinkel werden deshalb als Vektor gerechnet
+  und mit `sqrt` normiert, nicht über einen Winkel.
+- Kein Zugriff auf `window`, `document` oder das Canvas. Die Dateien laufen unverändert in Node.
+- Keine Objekt-Iterationsreihenfolge als Logik.
+
+## Der Renderer
+
+```tsx
+export default function Snake(props: GameProps) {
+    const canvas = useCanvas(SIZE, SIZE)
+    useSim({ create: createSnake, props, canvas, draw })
+    return <canvas ref={canvas} />
+}
+```
+
+`useSim` treibt die Simulation mit festem Zeitschritt, schreibt dabei das Eingabeprotokoll
+mit, meldet Punktestand und Spielende an den Host und ruft `draw` einmal je Frame. Der
+Renderer liest nur; er darf den Zustand nicht verändern und keine eigene Zeit führen. Die
+klickgesteuerten Spiele lassen `canvas` und `draw` weg und rendern aus dem zurückgegebenen
+Objekt.
+
+`useCanvas(w, h)` gibt eine feste logische Auflösung vor. Gezeichnet wird immer in Einheiten
+von `0..w` und `0..h`; die Skalierung auf die tatsächliche Fläche setzt der Hook über
+`ResizeObserver` und `devicePixelRatio`. Die Transformation darf ein Spiel nie zurücksetzen,
+`save()` und `restore()` sind in Ordnung.
+
+Für die klickgesteuerten Spiele gibt es `useSquare(max, min)`: Es misst den Container und
+liefert die Kantenlänge eines Quadrats. `aspect-ratio` reicht dort nicht, weil Chromium die
+Quadratur bricht, sobald die Höhe der Engpass ist.
 
 ## Steuerung
 
-`useControls` fasst Tastatur, Zeiger, Wischgesten und das Bildschirmpad zu einem Strom zusammen.
-Ein Spiel sieht nie, woher eine Eingabe kam:
+`useControls` fasst Tastatur, Zeiger, Wischgesten und das Bildschirmpad zu einer Bitmaske
+zusammen; ein Spiel sieht nie, woher eine Eingabe kam. WASD liegt bewusst neben den
+Pfeiltasten: in CEF schluckt GTA je nach Build die Pfeile.
 
-```ts
-type Action = 'up' | 'down' | 'left' | 'right' | 'fire' | 'alt'
+Ein kurzer Tipp würde zwischen zwei Ticks verlorengehen, deshalb bleibt er bis zum nächsten
+Tick in der Maske stehen. Das Bildschirmpad erscheint bei `(pointer: coarse)` und lässt sich
+mit `?pad=1` bzw. `?pad=0` erzwingen; welche Variante gezeichnet wird, entscheidet `scheme`
+aus `shared/games.ts`.
 
-type Controls = {
-    on(fn: (action: Action) => void): () => void
-    held(action: Action): boolean
-    axis(): number
-    pointer(): { x: number; y: number } | null
-}
-```
-
-`axis()` folgt dem Zeiger, solange er sich in den letzten 1,5 Sekunden bewegt hat, sonst den
-Tasten. WASD liegt bewusst neben den Pfeiltasten: in CEF schluckt GTA je nach Build die Pfeile.
-
-Das Bildschirmpad erscheint bei `(pointer: coarse)` und lässt sich mit `?pad=1` bzw. `?pad=0`
-erzwingen. Welche Variante gezeichnet wird, entscheidet `scheme` aus `shared/games.ts`:
-`dpad` bekommt ein Steuerkreuz, `tap` eine große Taste, `paddle` und `pointer` nichts — dort
-reicht Ziehen bzw. Klicken auf der Fläche.
-
-## Schleife und Canvas
-
-```ts
-useGameLoop((dt, now) => { ... }, !paused)
-```
-
-`dt` kommt in Sekunden und ist auf 0,1 gedeckelt. Ungedeckelt springt nach einem Tab-Wechsel
-jedes Spiel durch die halbe Welt.
-
-```ts
-const canvas = useCanvas(360, 540)
-```
-
-Gezeichnet wird **immer** in logischen Einheiten von `0..width` und `0..height`. Die Skalierung
-auf die tatsächliche Fläche setzt der Hook über `ResizeObserver` und `devicePixelRatio`;
-ein Spiel darf die Transformation nie zurücksetzen. `save()` und `restore()` sind in Ordnung.
-
-Die DOM-Spiele brauchen kein Canvas, aber dieselbe Anpassung an den Platz. Dafür gibt es
-`useSquare(max, min)`: Es misst den Container und liefert die Kantenlänge eines Quadrats.
-`aspect-ratio` reicht dort nicht, weil Chromium die Quadratur bricht, sobald die Höhe der
-Engpass ist.
-
-## Pause
+## Pause und Ende
 
 Der Host pausiert bei `blur`, bei `visibilitychange` auf versteckt, bei Escape und bei `P`.
-Fortgesetzt wird **immer** ausdrücklich per Klick, nie automatisch bei `focus` — sonst läuft das
-Spiel weiter, während der Spieler noch woanders klickt.
+Fortgesetzt wird immer ausdrücklich per Klick, nie automatisch bei `focus` — sonst läuft das
+Spiel weiter, während der Spieler noch woanders klickt. Beim Pausieren verwirft der Treiber
+die aufgelaufene Zeit, sonst holt die Simulation alle verpassten Ticks auf einmal nach.
+
+Nach dem Ende bleibt das Spiel montiert und nur pausiert; ausgehängt wird es erst beim
+Neustart, wenn `key={run}` wechselt. Jede Simulation muss deshalb nach `over` von selbst
+stillhalten.
 
 ## Neues Spiel hinzufügen
 
 1. Eintrag in `shared/games.ts` unter `GAMES` und ein Grenzwertpaar in `LIMITS`
-2. Loader in `web/src/shell/registry.ts`
-3. Komponente unter `web/src/games/<id>/`
+2. Simulation unter `shared/games/<id>.ts`, Fabrik in `shared/registry.ts` eintragen
+3. Renderer unter `web/src/games/<id>/`, Loader in `web/src/shell/registry.ts`
 
-Der Loader ist ein dynamisches `import()`, damit nicht alle zwölf Spiele im Startbündel landen.
-Das Menü stößt ihn schon beim Überfahren der Kachel an.
+Der Loader ist ein dynamisches `import()`, damit nicht alle zwölf Spiele im Startbündel
+landen. Das Menü stößt ihn schon beim Überfahren der Kachel an.
+
+Vor dem Abgeben prüfen, dass Direktlauf und Wiederholung dasselbe Ergebnis liefern — ein
+Skript, das die Simulation tickt, das entstandene Protokoll durch `replay()` schickt und
+Punktzahl und Tickzahl vergleicht, findet jede Verletzung der Regeln oben sofort.

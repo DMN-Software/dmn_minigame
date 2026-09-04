@@ -24,6 +24,8 @@ const SERVE_SPREAD = 0.73
 const PADDLE_SPREAD = 1.75
 
 export type BreakoutSim = Sim & {
+    score: number
+    over: boolean
     bricks: boolean[]
     px: number
     x: number

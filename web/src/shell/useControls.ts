@@ -24,7 +24,7 @@ const SWIPE_MIN = 24
 
 type Store = {
     held: number
-    /** was seit dem letzten tick gedrueckt wurde, aber schon wieder los ist */
+    // was seit dem letzten tick gedrueckt wurde, aber schon wieder los ist
     latched: number
     pick: number
     pointer: { x: number; y: number } | null

@@ -6,7 +6,7 @@ import { api, apiMessage } from './api.ts'
 
 type Props = {
     game: GameId
-    /** gesetzt, sobald ein lauf vorbei ist und noch nicht eingetragen wurde */
+    // gesetzt, sobald ein lauf vorbei ist und noch nicht eingetragen wurde
     pending: { token: string; log: Log } | null
     presetName: string
     onSubmitted: () => void
