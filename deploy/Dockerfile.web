@@ -1,0 +1,20 @@
+# build-kontext ist die repo-wurzel, web/ importiert shared/ ueber ../../shared
+FROM node:24-alpine AS build
+WORKDIR /app
+
+COPY web/package.json web/package-lock.json ./web/
+RUN cd web && npm ci
+
+COPY shared/ ./shared/
+COPY web/ ./web/
+RUN cd web && npm run build
+
+FROM caddy:2-alpine
+COPY --from=build /app/web/dist /srv
+COPY deploy/web.Caddyfile /etc/caddy/Caddyfile
+
+# port 8080 liegt ueber 1024, root wird dafuer nicht gebraucht
+RUN mkdir -p /data/caddy /config/caddy && chown -R 1000:1000 /data /config /srv
+USER 1000:1000
+
+EXPOSE 8080

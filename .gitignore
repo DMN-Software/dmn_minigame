@@ -1,0 +1,14 @@
+node_modules/
+dist/
+data/
+
+.env
+.credentials/
+
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*~
+Thumbs.db
+desktop.ini

@@ -1,0 +1,50 @@
+name: dmn-minigame
+
+# die dienste heissen absichtlich minigames-*: compose vergibt den dienstnamen immer
+# zusaetzlich als netz-alias. hiessen sie web und api, stuenden diese namen im geteilten
+# netz doppelt - der caddy des nachbarstacks kennt sie dort schon - und das docker-dns
+# loeste sie nichtdeterministisch auf.
+services:
+  minigames-api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    restart: unless-stopped
+    environment:
+      PORT: 8090
+      DB_PATH: /data/minigame.db
+      IP_SALT: ${IP_SALT:?bitte in deploy/.env setzen}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?bitte in deploy/.env setzen}
+    volumes:
+      - api-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8090/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks: [edge]
+
+  minigames-web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    restart: unless-stopped
+    depends_on:
+      - minigames-api
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks: [edge]
+
+volumes:
+  api-data:
+
+networks:
+  # von hand angelegt, der caddy des nachbarstacks wird zusaetzlich hier eingehaengt
+  edge:
+    name: minigame_edge
+    external: true

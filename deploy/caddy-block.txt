@@ -1,0 +1,26 @@
+# minispiele, laeuft im compose-projekt dmn-minigame
+minigames.dmn-software.com {
+	encode zstd gzip
+
+	header {
+		# die seite wird bewusst ueberall eingebettet, cef wertet nur csp aus.
+		# style-src braucht unsafe-inline wegen des inline-style in index.html.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors *"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-X-Frame-Options
+	}
+
+	# handle statt nackter matcher, sonst entscheidet die direktivenreihenfolge wohin /api/* geht
+	handle /api/* {
+		reverse_proxy minigames-api:8090 {
+			# ohne das ueberschreiben waere req.ip in der api frei vom client waehlbar
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+
+	handle {
+		reverse_proxy minigames-web:8080
+	}
+}

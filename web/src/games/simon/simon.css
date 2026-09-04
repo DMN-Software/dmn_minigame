@@ -1,0 +1,38 @@
+.simon__board {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    width: min(100%, 360px);
+    max-height: 100%;
+    aspect-ratio: 1;
+}
+
+.simon__pad {
+    min-width: 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    opacity: .28;
+    cursor: pointer;
+    transition: opacity .08s, transform .1s;
+}
+.simon__pad:active { transform: scale(.97); }
+.simon__pad--lit { opacity: 1; }
+
+.simon__pad--0 {
+    background: var(--p1);
+    border-top-left-radius: 70%;
+}
+.simon__pad--1 {
+    background: var(--p2);
+    border-top-right-radius: 70%;
+}
+.simon__pad--2 {
+    background: var(--p3);
+    border-bottom-left-radius: 70%;
+}
+.simon__pad--3 {
+    background: var(--p4);
+    border-bottom-right-radius: 70%;
+}
