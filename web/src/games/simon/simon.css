@@ -1,38 +1,64 @@
-.simon__board {
+.simon {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 10px;
-    width: min(100%, 360px);
-    max-height: 100%;
-    aspect-ratio: 1;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.simon__disc {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3%;
+    padding: 4%;
+    border-radius: 50%;
+    background: #1c1c1c;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 2px #2e2e2e;
+    touch-action: none;
 }
 
 .simon__pad {
     min-width: 0;
     padding: 0;
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    opacity: .28;
+    border: 0;
     cursor: pointer;
-    transition: opacity .08s, transform .1s;
+    /* nur der farbwechsel beim aufleuchten, sonst springt die scheibe */
+    transition: background-color .09s linear;
 }
-.simon__pad:active { transform: scale(.97); }
-.simon__pad--lit { opacity: 1; }
+.simon__pad:active { box-shadow: inset 0 0 30px rgba(0, 0, 0, .4); }
 
-.simon__pad--0 {
-    background: var(--p1);
-    border-top-left-radius: 70%;
-}
-.simon__pad--1 {
-    background: var(--p2);
-    border-top-right-radius: 70%;
-}
-.simon__pad--2 {
-    background: var(--p3);
-    border-bottom-left-radius: 70%;
-}
-.simon__pad--3 {
-    background: var(--p4);
-    border-bottom-right-radius: 70%;
+.simon__pad--0 { border-radius: 100% 0 0 0; background: #00a74a; }
+.simon__pad--1 { border-radius: 0 100% 0 0; background: #9f0f17; }
+.simon__pad--2 { border-radius: 0 0 0 100%; background: #cca707; }
+.simon__pad--3 { border-radius: 0 0 100% 0; background: #094a8f; }
+
+.simon__pad--0.simon__pad--lit { background: #22ef78; }
+.simon__pad--1.simon__pad--lit { background: #ef2b34; }
+.simon__pad--2.simon__pad--lit { background: #f7e02e; }
+.simon__pad--3.simon__pad--lit { background: #2196f3; }
+
+.simon__pad--lit { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .45); }
+
+.simon__hub {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 34%;
+    height: 34%;
+    margin: -17% 0 0 -17%;
+    border-radius: 50%;
+    background: #22252a;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .22);
+    color: var(--text);
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
 }

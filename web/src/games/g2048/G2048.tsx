@@ -7,9 +7,10 @@ import './g2048.css'
 const SLOTS = Array.from({ length: SIZE * SIZE }, (_, i) => i)
 
 function fontScale(value: number): number {
-    if (value < 100) return 0.44
-    if (value < 1000) return 0.34
-    return 0.26
+    if (value < 100) return 0.5
+    if (value < 1000) return 0.4
+    if (value < 10000) return 0.3
+    return 0.24
 }
 
 function faceClass(t: Tile): string {
@@ -21,7 +22,7 @@ function faceClass(t: Tile): string {
 
 export default function G2048(props: GameProps) {
     const sim = useSim({ create: create2048, props })
-    const [area, size] = useSquare(380)
+    const [area, size] = useSquare()
 
     const gap = Math.max(4, Math.round(size * 0.022))
     const cell = (size - gap * (SIZE + 1)) / SIZE

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // quadratische spielflaeche im verfuegbaren platz. aspect-ratio bricht in chromium,
 // sobald die hoehe der engpass ist, deshalb wird gemessen.
-export function useSquare(max: number, min = 140) {
+export function useSquare(max = 560, min = 140) {
     const box = useRef<HTMLDivElement | null>(null)
     const [size, setSize] = useState(max)
 

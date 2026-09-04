@@ -6,6 +6,58 @@ import type { GameProps } from '../../shell/types.ts'
 import './minesweeper.css'
 
 const HOLD = 400
+// kopfzeile und die fasen ringsum gehen von der hoehe ab, bevor das raster geteilt wird
+const CHROME = 76
+
+const SEGMENTS: [string, number, number, number, number][] = [
+    ['a', 4, 1, 12, 4],
+    ['b', 15, 4, 4, 13],
+    ['c', 15, 19, 4, 13],
+    ['d', 4, 31, 12, 4],
+    ['e', 1, 19, 4, 13],
+    ['f', 1, 4, 4, 13],
+    ['g', 4, 16, 12, 4],
+]
+
+const GLYPHS: Record<string, string> = {
+    '0': 'abcdef',
+    '1': 'bc',
+    '2': 'abged',
+    '3': 'abgcd',
+    '4': 'fgbc',
+    '5': 'afgcd',
+    '6': 'afgecd',
+    '7': 'abc',
+    '8': 'abcdefg',
+    '9': 'abcdfg',
+    '-': 'g',
+}
+
+function counter(n: number): string {
+    if (n < 0) return '-' + String(Math.min(99, -n)).padStart(2, '0')
+    return String(Math.min(999, n)).padStart(3, '0')
+}
+
+function Led({ text }: { text: string }) {
+    return (
+        <span className="mine__led">
+            {text.split('').map((ch, i) => (
+                <svg key={i} className="mine__digit" viewBox="0 0 20 36">
+                    {SEGMENTS.map(([id, x, y, w, h]) => (
+                        <rect
+                            key={id}
+                            x={x}
+                            y={y}
+                            width={w}
+                            height={h}
+                            fill={GLYPHS[ch].includes(id) ? '#ff0000' : '#3b0000'}
+                        />
+                    ))}
+                </svg>
+            ))}
+        </span>
+    )
+}
 
 function cellClass(c: Cell, boom: boolean): string {
     let cls = 'mine__cell'
@@ -23,7 +75,7 @@ function face(c: Cell): ReactNode {
 
 export default function Minesweeper(props: GameProps) {
     const sim = useSim({ create: createMinesweeper, props })
-    const [area, size] = useSquare(380)
+    const [area, size] = useSquare()
     const press = useRef(0)
     const skip = useRef(false)
 
@@ -54,43 +106,46 @@ export default function Minesweeper(props: GameProps) {
 
     let left = MINES
     for (const c of sim.cells) if (c.flag) left -= 1
-    const cell = Math.floor(size / COLS)
+
+    // ganze pixel je feld, sonst franst das relief der fasen aus
+    const cell = Math.max(16, Math.floor((size - CHROME) / COLS))
+    const board = cell * COLS
 
     return (
         <div className="mine">
-            <p className="mine__status">
-                <span className="mine__count">Minen {left}</span>
-                <span>Rechtsklick oder halten setzt eine Flagge</span>
-            </p>
-
             <div className="mine__area" ref={area}>
-                <div
-                    className="mine__board"
-                    style={{ width: size, height: size, fontSize: Math.round(cell * 0.55) }}
-                >
-                    {sim.cells.map((c, i) => (
-                        <button
-                            key={i}
-                            type="button"
-                            className={cellClass(c, sim.boom === i)}
-                            onPointerDown={(e) => down(i, e.button)}
-                            onPointerUp={() => up(i)}
-                            onPointerLeave={abort}
-                            onPointerCancel={abort}
-                            onContextMenu={(e) => {
-                                e.preventDefault()
-                                // beim halten auf dem touchscreen kommt contextmenu hinterher,
-                                // die flagge liegt dann schon
-                                if (skip.current || busy) return
-                                abort()
-                                props.controls.choose(i * 2 + 1)
-                            }}
-                        >
-                            {face(c)}
-                        </button>
-                    ))}
+                <div className="mine__frame">
+                    <div className="mine__head">
+                        <Led text={counter(left)} />
+                    </div>
+
+                    <div className="mine__board" style={{ width: board, height: board, fontSize: Math.round(cell * 0.62) }}>
+                        {sim.cells.map((c, i) => (
+                            <button
+                                key={i}
+                                type="button"
+                                className={cellClass(c, sim.boom === i)}
+                                onPointerDown={(e) => down(i, e.button)}
+                                onPointerUp={() => up(i)}
+                                onPointerLeave={abort}
+                                onPointerCancel={abort}
+                                onContextMenu={(e) => {
+                                    e.preventDefault()
+                                    // beim halten auf dem touchscreen kommt contextmenu hinterher,
+                                    // die flagge liegt dann schon
+                                    if (skip.current || busy) return
+                                    abort()
+                                    props.controls.choose(i * 2 + 1)
+                                }}
+                            >
+                                {face(c)}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            <p className="mine__status">Rechtsklick oder halten setzt eine Flagge</p>
         </div>
     )
 }

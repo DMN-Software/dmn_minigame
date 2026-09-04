@@ -27,33 +27,117 @@
     flex: 1 1 0;
     width: 100%;
     min-height: 0;
+    padding: 10px;
     overflow: hidden;
 }
 
 .ttt__board {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 6px;
+    border-radius: 10px;
+    background: #f7f4ec;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, .5);
+    touch-action: none;
 }
 
-.ttt__board .ttt__cell {
+.ttt__rule {
+    position: absolute;
+    border-radius: 999px;
+    background: #2f2a24;
+}
+
+.ttt__rule--v {
+    top: 7%;
+    width: 2.4%;
+    height: 86%;
+    margin-left: -1.2%;
+}
+.ttt__rule--v1 { left: 33.33%; }
+.ttt__rule--v2 { left: 66.67%; }
+
+.ttt__rule--h {
+    left: 7%;
+    width: 86%;
+    height: 2.4%;
+    margin-top: -1.2%;
+}
+.ttt__rule--h1 { top: 33.33%; }
+.ttt__rule--h2 { top: 66.67%; }
+
+.ttt__cell {
+    position: relative;
+    min-width: 0;
     padding: 0;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: 1;
-    color: var(--text-faint);
+    border: 0;
+    background: none;
     cursor: pointer;
 }
+.ttt__cell:disabled { cursor: default; }
 
-.ttt__board .ttt__cell:disabled {
-    cursor: default;
+.ttt__cell--x::before,
+.ttt__cell--x::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10%;
+    height: 58%;
+    margin: -29% 0 0 -5%;
+    border-radius: 999px;
+    background: #d1495b;
+}
+.ttt__cell--x::before { transform: rotate(45deg); }
+.ttt__cell--x::after { transform: rotate(-45deg); }
+
+/* der ring kommt aus dem verlauf, weil border-width keine prozente kennt */
+.ttt__cell--o::before {
+    content: '';
+    position: absolute;
+    left: 21%;
+    top: 21%;
+    right: 21%;
+    bottom: 21%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, transparent 0 62%, #2a628f 64% 100%);
 }
 
-.ttt__cell--x { color: var(--p1); }
-.ttt__cell--o { color: var(--p2); }
-
-.ttt__cell--win {
-    border-color: currentColor;
-    background: var(--bg-sunken);
+.ttt__win {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
 }
+
+.ttt__win--x { background: #d1495b; }
+.ttt__win--o { background: #2a628f; }
+
+.ttt__win--row {
+    left: 8%;
+    width: 84%;
+    height: 3.4%;
+    margin-top: -1.7%;
+}
+.ttt__win--r0 { top: 16.67%; }
+.ttt__win--r1 { top: 50%; }
+.ttt__win--r2 { top: 83.33%; }
+
+.ttt__win--col {
+    top: 8%;
+    width: 3.4%;
+    height: 84%;
+    margin-left: -1.7%;
+}
+.ttt__win--c0 { left: 16.67%; }
+.ttt__win--c1 { left: 50%; }
+.ttt__win--c2 { left: 83.33%; }
+
+.ttt__win--diag {
+    left: -2%;
+    top: 50%;
+    width: 104%;
+    height: 3.4%;
+    margin-top: -1.7%;
+}
+.ttt__win--d1 { transform: rotate(45deg); }
+.ttt__win--d2 { transform: rotate(-45deg); }
