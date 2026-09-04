@@ -13,21 +13,18 @@ einem iframe eingebunden. Dieselbe Seite ist im normalen Browser spielbar.
 
 | Spiel | Steuerung | Technik |
 |---|---|---|
-| Schlange | Richtungstasten, Wischen | Canvas |
-| Flatterflug | Tippen | Canvas |
-| Drei gewinnt | Klicken | DOM |
-| Turmbau | Tippen | Canvas |
+| Snake | Richtungstasten, Wischen | Canvas |
+| Flappy Bird | Tippen | Canvas |
+| Tic-Tac-Toe | Klicken | DOM |
+| Tower Stack | Tippen | Canvas |
 | 2048 | Richtungstasten, Wischen | DOM |
-| Steinbruch | Zeiger, Richtungstasten | Canvas |
-| Minenfeld | Klicken, langer Druck für Flagge | DOM |
-| Paare | Klicken | DOM |
-| Blockstapler | Richtungstasten | Canvas |
-| Tischtennis | Zeiger, Richtungstasten | Canvas |
-| Farbfolge | Klicken | DOM |
-| Sprungturm | Richtungstasten, Zeiger | Canvas |
-
-Die angezeigten Namen sind bewusst neutral gewählt — mehrere der Vorbilder sind eingetragene
-Marken, und dieses Repository ist öffentlich.
+| Breakout | Zeiger, Richtungstasten | Canvas |
+| Minesweeper | Klicken, langer Druck für Flagge | DOM |
+| Memory | Klicken | DOM |
+| Tetris | Richtungstasten | Canvas |
+| Pong | Zeiger, Richtungstasten | Canvas |
+| Simon Says | Klicken | DOM |
+| Doodle Jump | Richtungstasten | Canvas |
 
 ## Aufbau
 
