@@ -163,7 +163,7 @@ export function GameHost({ id, params, onBack }: { id: GameId; params: Params; o
                     {phase === 'over' && (
                         <Overlay title="Vorbei" text={score + ' Punkte'} action="Nochmal" onAction={() => void start()}>
                             {!params.kiosk && (
-                                <button className="btn btn--ghost" style={{ marginTop: 8 }} onClick={onBack}>
+                                <button className="btn btn--ghost" onClick={onBack}>
                                     Anderes Spiel
                                 </button>
                             )}

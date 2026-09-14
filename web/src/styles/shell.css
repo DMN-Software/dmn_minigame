@@ -8,15 +8,26 @@ html, body {
 }
 
 body {
-    background: var(--bg);
+    background: var(--dark);
     color: var(--text);
-    font-family: var(--font);
+    font-family: var(--sans);
     font-size: 14px;
     line-height: 1.45;
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* korn wie auf dmn-software.com. die spielflaeche liegt darueber, siehe .stage */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: url(/grain.svg);
+    opacity: .05;
+    pointer-events: none;
 }
 
 body:focus, body:focus-visible { outline: none; }
@@ -31,6 +42,22 @@ button {
     cursor: pointer;
 }
 
+.brand:focus-visible,
+.game:focus-visible,
+.btn:focus-visible,
+.hud__back:focus-visible,
+.hud__pause:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
 .app {
     display: flex;
     flex-direction: column;
@@ -38,31 +65,70 @@ button {
     min-height: 0;
 }
 
+/* spielansicht */
+
 .hud {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--line-soft);
-    background: var(--bg-raised);
+    min-height: 48px;
+    padding: 4px 10px 4px 14px;
+    border-bottom: 1px solid var(--edge);
+    background: var(--dark);
     flex: none;
 }
 
-.hud__back {
-    padding: 4px 10px;
-    border-radius: var(--r-sm);
-    color: var(--text-dim);
-}
-.hud__back:hover { color: var(--text); background: var(--line-soft); }
+.hud__mark { flex: none; width: 22px; height: 22px; }
 
-.hud__title { font-weight: 600; }
+.hud__back,
+.hud__pause {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    border-radius: 6px;
+    color: var(--text);
+    transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, transform 160ms var(--ease);
+}
+
+.hud__back { padding: 0 10px 0 6px; }
+.hud__back svg { width: 15px; height: 15px; color: var(--red); }
+
+.hud__pause {
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    font-size: 13px;
+}
+
+.hud__title {
+    padding-left: 12px;
+    border-left: 1px solid var(--edge);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    /* zwischen 480 und etwa 540 px breite schiebt der titel sonst den pause-knopf aus dem bild */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .hud__spacer { flex: 1; }
 
-.hud__stat { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.hud__stat b { color: var(--accent); font-weight: 600; }
-.hud__stat span { color: var(--text-faint); }
+.hud__stat {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.hud__stat span { color: var(--muted); }
+.hud__stat b { color: var(--white); font-weight: 600; }
 
-.hud--tight .hud__title { display: none; }
+.hud--tight { gap: 10px; min-height: 40px; padding-left: 8px; }
+.hud--tight .hud__title,
+.hud--tight .hud__mark { display: none; }
 
 .body {
     display: flex;
@@ -72,13 +138,15 @@ button {
 
 .stage {
     position: relative;
+    /* ueber dem korn, die spiele bleiben so, wie sie gezeichnet werden */
+    z-index: 91;
     display: grid;
     place-items: center;
     min-width: 0;
     min-height: 0;
     flex: 1;
     padding: 10px;
-    background: var(--bg-sunken);
+    background: var(--dark);
 }
 
 .stage__inner {
@@ -96,20 +164,20 @@ button {
     display: block;
     max-width: 100%;
     max-height: 100%;
-    border-radius: var(--r-md);
-    background: var(--bg);
+    border-radius: 8px;
+    background: var(--dark);
 }
 
 .side {
-    width: 260px;
+    width: 272px;
     flex: none;
-    border-left: 1px solid var(--line-soft);
-    background: var(--bg-raised);
+    border-left: 1px solid var(--edge);
+    background: var(--ink);
     overflow-y: auto;
 }
 
 .app--narrow .body { flex-direction: column; }
-.app--narrow .side { width: auto; border-left: 0; border-top: 1px solid var(--line-soft); max-height: 38%; }
+.app--narrow .side { width: auto; border-left: 0; border-top: 1px solid var(--edge); max-height: 38%; }
 
 .overlay {
     position: absolute;
@@ -117,118 +185,112 @@ button {
     display: grid;
     place-items: center;
     padding: 16px;
-    background: rgba(9, 11, 14, 0.82);
+    background: rgba(11, 11, 13, .84);
+    animation: fade 160ms ease-out both;
 }
 
 .card {
-    width: min(320px, 100%);
-    padding: 18px;
-    text-align: center;
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg-raised);
+    width: min(340px, 100%);
+    padding: 22px 22px 24px;
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 32px 64px -40px rgba(2, 2, 6, .9);
+    animation: card-in 240ms var(--ease) both;
 }
 
-.card h2 { margin: 0 0 4px; font-size: 18px; }
-.card p { margin: 0 0 14px; color: var(--text-dim); }
+.card h2 {
+    margin: 0 0 6px;
+    color: var(--white);
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -.03em;
+}
+
+.card p { margin: 0 0 20px; font-size: 15px; }
+
+.card__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+@media (max-height: 400px) {
+    .card { padding: 14px 16px 16px; }
+    .card h2 { font-size: 20px; }
+    .card p { margin-bottom: 12px; font-size: 14px; }
+}
 
 .btn {
-    display: inline-block;
-    padding: 9px 18px;
-    border-radius: var(--r-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    color: var(--white);
+    background: var(--red);
     font-weight: 600;
-    color: var(--bg);
-    background: var(--accent);
+    transition: box-shadow 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 160ms var(--ease);
 }
-.btn:hover { filter: brightness(1.08); }
 
 .btn--ghost {
-    color: var(--text-dim);
+    color: var(--text);
     background: none;
     border: 1px solid var(--line);
-}
-.btn--ghost:hover { color: var(--text); border-color: var(--text-faint); }
-
-.menu { height: 100%; padding: 18px; overflow-y: auto; }
-.menu__inner { max-width: 900px; margin: 0 auto; }
-.menu__head { margin-bottom: 16px; }
-.menu__head h1 { margin: 0; font-size: 20px; }
-.menu__head p { margin: 2px 0 0; color: var(--text-dim); }
-
-.menu__grid {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    font-weight: 500;
 }
 
-.tile {
-    position: relative;
-    padding: 14px 14px 14px 16px;
-    overflow: hidden;
-    text-align: left;
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    background: var(--bg-raised);
-    transition: transform .12s;
+.btn:disabled {
+    color: var(--muted);
+    background: var(--edge);
+    cursor: default;
 }
 
-/* der farbstreifen sitzt als pseudo-element, damit der rand des kastens ruhig bleibt */
-.tile::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
-    background: var(--tile-accent, var(--accent));
+.board { padding: 14px 14px 18px; }
+
+.board h3 {
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--edge);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
 }
 
-.tile:hover { transform: translateY(-2px); }
-.tile:active { transform: translateY(0); }
-
-.tile__dot {
-    display: block;
-    width: 9px;
-    height: 9px;
-    margin-bottom: 9px;
-    border-radius: 2px;
-    background: var(--tile-accent, var(--accent));
-}
-
-.tile b { display: block; margin-bottom: 3px; font-size: 15px; }
-.tile__hint { display: block; color: var(--text-dim); font-size: 12px; line-height: 1.35; }
-
-.board { padding: 12px; }
-.board h3 { margin: 0 0 8px; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .04em; }
 .board ol { margin: 0; padding: 0; list-style: none; }
+
 .board li {
     display: flex;
-    gap: 8px;
-    padding: 4px 6px;
-    border-radius: var(--r-sm);
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 6px;
+    border-bottom: 1px solid var(--edge);
     font-variant-numeric: tabular-nums;
 }
-.board li.is-me { background: var(--accent-dim); }
-.board li i { width: 20px; color: var(--text-faint); font-style: normal; }
-.board li em { flex: 1; font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.board li b { font-family: var(--mono); font-weight: 600; }
-.board__empty { color: var(--text-faint); }
+.board li.is-me { background: rgba(225, 29, 46, .1); box-shadow: inset 2px 0 var(--red); }
+.board li i { width: 20px; color: var(--muted); font: 500 12px var(--mono); }
+.board li.is-me i { color: var(--red-hi); }
+.board li em { flex: 1; min-width: 0; font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board li b { color: var(--white); font-family: var(--mono); font-size: 13px; font-weight: 600; }
 
-.namebox { display: flex; gap: 6px; margin-top: 10px; }
+.board__empty { margin: 0; color: var(--muted); }
+.board .board__empty { margin-top: 10px; }
+
+.namebox { display: flex; gap: 6px; margin-top: 14px; }
 .namebox input {
     flex: 1;
     min-width: 0;
-    padding: 7px 9px;
-    color: var(--text);
-    background: var(--bg-sunken);
+    padding: 7px 10px;
+    color: var(--white);
+    background: var(--dark);
     border: 1px solid var(--line);
-    border-radius: var(--r-md);
+    border-radius: 6px;
     font: inherit;
+    transition: border-color 150ms ease-out;
 }
-.namebox input:focus { outline: none; border-color: var(--accent-dim); }
-.namebox button { padding: 7px 12px; border-radius: var(--r-md); background: var(--accent); color: var(--bg); font-weight: 600; }
-.namebox button:disabled { opacity: .45; cursor: default; }
+.namebox input:focus { outline: none; border-color: var(--red); }
+.namebox .btn { min-height: 0; padding: 7px 12px; border-radius: 6px; }
 
-.note { margin-top: 8px; color: var(--text-faint); font-size: 12px; }
-.note--bad { color: var(--bad); }
+.note { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+.note--bad { color: var(--red-hi); }
 
 .pad {
     position: absolute;
@@ -245,10 +307,216 @@ button {
 .pad__key {
     display: grid;
     place-items: center;
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    background: rgba(22, 27, 34, .85);
-    color: var(--text-dim);
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    background: rgba(20, 21, 26, .88);
+    color: var(--text);
 }
-.pad__key:active { background: var(--accent-dim); color: var(--text); }
+.pad__key:active { border-color: var(--red); background: rgba(225, 29, 46, .3); color: var(--white); }
 .pad__fire { width: 72px; height: 72px; border-radius: 50%; }
+
+/* auswahl */
+
+.menu {
+    height: 100%;
+    overflow-y: auto;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.top { border-bottom: 1px solid var(--edge); }
+
+.top__in {
+    display: flex;
+    align-items: center;
+    height: 52px;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    text-decoration: none;
+    transition: transform 160ms var(--ease);
+}
+
+.brand img { width: 28px; height: 28px; }
+.brand__slash { margin: 0 .18em; color: var(--red); font-weight: 500; }
+.brand__soft { color: var(--text); font-weight: 500; }
+
+.menu__head {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 32px;
+    margin: clamp(24px, 7vh, 72px) 0 4px;
+    padding-bottom: 18px;
+}
+
+/* als eigenes element, damit die linie beim ersten aufruf von links einlaufen kann */
+.menu__head::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--edge);
+    transform-origin: left;
+}
+
+.menu__head h1 {
+    margin: 0;
+    color: var(--white);
+    font-size: clamp(32px, 18px + 3.4vw, 56px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.035em;
+}
+
+.menu__head h1 span { display: block; }
+.menu__head p { margin: 0; color: var(--muted); }
+
+/* kleine iframes: kopf und ueberschrift duerfen die liste nicht aus dem bild schieben */
+@media (max-height: 420px) {
+    .top__in { height: 40px; }
+    .brand { gap: 8px; font-size: 15px; }
+    .brand img { width: 22px; height: 22px; }
+    .menu__head { margin-top: 14px; padding-bottom: 10px; }
+    .menu__head h1 { font-size: 26px; }
+    .menu__head p { font-size: 14px; }
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+    column-gap: 32px;
+    margin: 0 0 56px;
+    padding: 0;
+    list-style: none;
+}
+
+.game {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 16px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 4px 15px;
+    border-bottom: 1px solid var(--edge);
+    text-align: left;
+    transition: background-color 150ms ease-out, transform 160ms var(--ease);
+}
+
+.game__no {
+    align-self: start;
+    padding-top: 3px;
+    color: var(--muted);
+    font: 500 13px/1.5 var(--mono);
+    transition: color 150ms ease-out;
+}
+
+.game__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.game b {
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -.01em;
+}
+
+/* die leitfarbe des vorbilds, bewusst klein: die seite hat nur ein rot als akzent */
+.game__dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin: 0 9px 2px 0;
+    border-radius: 2px;
+    vertical-align: middle;
+    background: var(--tile-accent);
+}
+
+.game__input {
+    flex: none;
+    color: var(--muted);
+    font: 12px var(--mono);
+}
+
+.game__hint {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.game__go {
+    width: 16px;
+    height: 16px;
+    color: var(--line);
+    transition: color 150ms ease-out, transform 200ms var(--ease);
+}
+
+.brand:active,
+.btn:active:not(:disabled),
+.hud__back:active,
+.hud__pause:active { transform: scale(.97); }
+
+.game:active { transform: scale(.985); }
+
+@media (hover: hover) and (pointer: fine) {
+    .game:hover { background: rgba(255, 255, 255, .025); }
+    .game:hover .game__no { color: var(--red-hi); }
+    .game:hover .game__go { color: var(--red); transform: translateX(3px); }
+
+    .btn:hover:not(:disabled) { box-shadow: inset 0 0 0 40px rgba(0, 0, 0, .14); }
+    .btn--ghost:hover { color: var(--white); border-color: var(--muted); }
+
+    .hud__back:hover { color: var(--white); background: var(--card); }
+    .hud__pause:hover { color: var(--white); border-color: var(--muted); }
+}
+
+@keyframes fade {
+    from { opacity: 0; }
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(6px) scale(.98); }
+}
+
+/* maske wie auf der startseite: der clip wandert mit dem translate, sichtbar bleibt nur die zeile */
+@keyframes line-up {
+    from { transform: translateY(110%); clip-path: inset(-.3em -.3em 110% -.3em); }
+    to { clip-path: inset(-.3em); }
+}
+
+@keyframes grow {
+    from { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .menu--intro .menu__head h1 span { animation: line-up 800ms var(--ease) both; }
+    .menu--intro .menu__head p { animation: rise 700ms var(--ease) 180ms both; }
+    .menu--intro .menu__head::after { animation: grow 1100ms var(--ease) 120ms both; }
+    .menu--intro .games > li { animation: rise 600ms var(--ease) both; animation-delay: calc(240ms + var(--i) * 35ms); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .menu--intro .menu__head,
+    .menu--intro .games { animation: fade 300ms ease-out both; }
+
+    .card { animation-name: fade; }
+}

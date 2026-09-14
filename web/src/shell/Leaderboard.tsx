@@ -61,7 +61,7 @@ export function Leaderboard({ game, pending, presetName, onSubmitted }: Props) {
                 <ol>
                     {top.map((row) => (
                         <li key={`${row.rank}-${row.name}`} className={rank === row.rank ? 'is-me' : undefined}>
-                            <i>{row.rank}</i>
+                            <i>{String(row.rank).padStart(2, '0')}</i>
                             <em>{row.name}</em>
                             <b>{row.score}</b>
                         </li>
@@ -79,7 +79,7 @@ export function Leaderboard({ game, pending, presetName, onSubmitted }: Props) {
                             onChange={(e) => setName(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && submit()}
                         />
-                        <button disabled={!valid || busy} onClick={submit}>
+                        <button className="btn" disabled={!valid || busy} onClick={submit}>
                             Eintragen
                         </button>
                     </div>

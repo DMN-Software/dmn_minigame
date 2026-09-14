@@ -1,30 +1,25 @@
+/* werte aus dmn-software.com, damit die minispiele wie ein teil der seite aussehen */
 :root {
-    --bg: #0d1014;
-    --bg-raised: #161b22;
-    --bg-sunken: #090b0e;
-    --line: #232a33;
-    --line-soft: #1a2027;
+    --dark: #0b0b0d;
+    --ink: #101114;
+    --card: #14151a;
+    --edge: #25272d;
+    --line: #3f4249;
 
-    --text: #e6ebf2;
-    --text-dim: #8b97a6;
-    --text-faint: #5c6673;
+    --white: #ffffff;
+    --text: #b9bcc4;
+    --muted: #8f939c;
 
-    --accent: #4ade80;
-    --accent-dim: #22683f;
-    --warn: #fbbf24;
-    --bad: #f87171;
+    --red: #e11d2e;
+    /* --red kommt auf --dark nur auf 4.1:1, fuer kleinen roten text reicht das nicht */
+    --red-hi: #f0414f;
 
-    --p1: #4ade80;
-    --p2: #38bdf8;
-    --p3: #f472b6;
-    --p4: #fbbf24;
-    --p5: #a78bfa;
-    --p6: #fb923c;
+    /* die spiele lesen noch die alten namen */
+    --text-dim: var(--muted);
+    --text-faint: var(--muted);
 
-    --r-sm: 4px;
-    --r-md: 8px;
-    --r-lg: 14px;
+    --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
 
-    --font: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
+    --ease: cubic-bezier(.23, 1, .32, 1);
 }
