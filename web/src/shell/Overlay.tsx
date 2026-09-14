@@ -14,10 +14,12 @@ export function Overlay({ title, text, action, onAction, children }: Props) {
             <div className="card">
                 <h2>{title}</h2>
                 {text && <p>{text}</p>}
-                <button className="btn" onClick={onAction} autoFocus>
-                    {action}
-                </button>
-                {children}
+                <div className="card__actions">
+                    <button className="btn" onClick={onAction} autoFocus>
+                        {action}
+                    </button>
+                    {children}
+                </div>
             </div>
         </div>
     )
