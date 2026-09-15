@@ -85,6 +85,14 @@ export function Menu({ onPick }: { onPick: (id: GameId) => void }) {
                     ))}
                 </ol>
             </main>
+
+            {!framed && (
+                <footer className="wrap legal">
+                    <a href="https://dmn-software.com/impressum.html">Impressum</a>
+                    <span aria-hidden="true"> · </span>
+                    <a href="https://dmn-software.com/datenschutz.html">Datenschutz</a>
+                </footer>
+            )}
         </div>
     )
 }
