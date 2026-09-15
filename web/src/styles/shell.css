@@ -43,6 +43,7 @@ button {
 }
 
 .brand:focus-visible,
+.legal a:focus-visible,
 .game:focus-visible,
 .btn:focus-visible,
 .hud__back:focus-visible,
@@ -473,10 +474,26 @@ button {
 
 .game:active { transform: scale(.985); }
 
+.legal {
+    margin-top: -32px;
+    padding-bottom: 24px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.legal a {
+    color: inherit;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: color 150ms ease-out;
+}
+
 @media (hover: hover) and (pointer: fine) {
     .game:hover { background: rgba(255, 255, 255, .025); }
     .game:hover .game__no { color: var(--red-hi); }
     .game:hover .game__go { color: var(--red); transform: translateX(3px); }
+
+    .legal a:hover { color: var(--white); }
 
     .btn:hover:not(:disabled) { box-shadow: inset 0 0 0 40px rgba(0, 0, 0, .14); }
     .btn--ghost:hover { color: var(--white); border-color: var(--muted); }
