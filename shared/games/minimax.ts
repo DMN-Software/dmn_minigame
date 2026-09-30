@@ -27,8 +27,6 @@ export function judge(b: Board): Result | null {
     return b.every((m) => m !== null) ? { winner: null, line: [] } : null
 }
 
-// aus sicht von O. die tiefe geht mit ein, damit ein sieg frueh und eine niederlage
-// so spaet wie moeglich kommt
 function value(b: Board, turn: Player, depth: number): number {
     const res = judge(b)
     if (res) {
@@ -64,7 +62,6 @@ export function aiMove(rng: Rng, board: Board, slip: number): number {
             top = v
             picks = [i]
         } else if (v === top) {
-            // gleichwertige zuege wuerfeln, sonst spielt O jede partie dieselbe eroeffnung
             picks.push(i)
         }
     }

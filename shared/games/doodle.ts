@@ -10,7 +10,6 @@ export const PLAT_H = 10
 const START_Y = H - 80
 const BASE_Y = START_Y - PH / 2
 const UNIT = 10
-// die alten px/s-werte durch 60 geteilt, gerechnet wird in einheiten je tick
 const GRAVITY = 1500 / 3600
 const JUMP = -660 / 60
 const MOVE = 300 / 60
@@ -31,7 +30,6 @@ export function createDoodle(rng: Rng): DoodleSim {
 
     function addPlat() {
         const last = plats[plats.length - 1]
-        // der sprung schafft knapp 140 px, mehr als 122 laesst sich seitlich nicht mehr ausgleichen
         const reach = Math.min(122, 96 + (START_Y - last.y) / 90)
         plats.push({ x: rng() * (W - PLAT_W), y: last.y - (58 + rng() * (reach - 58)) })
     }

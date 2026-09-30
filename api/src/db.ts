@@ -2,8 +2,6 @@ import { createHash } from 'node:crypto'
 import { DatabaseSync } from 'node:sqlite'
 import { env } from './env.ts'
 
-// index + 1 ist die schemaversion. ein ausgelieferter block wird nie mehr angefasst,
-// aenderungen kommen als weiterer eintrag dazu.
 const MIGRATIONS = [
     `
     CREATE TABLE scores (
@@ -54,12 +52,10 @@ const dropUsedSessions = db.prepare('DELETE FROM sessions WHERE used_at IS NOT N
 
 export function pruneSessions() {
     const now = Date.now()
-    // die ttl ist zwei stunden, alles darueber ist ohnehin unbrauchbar
     dropOldSessions.run(now - 3 * 60 * 60 * 1000)
     dropUsedSessions.run(now - 10 * 60 * 1000)
 }
 
-// die rohe ip landet weder in der datenbank noch im log
 export function ipHash(ip: string): string {
     return createHash('sha256').update(ip + env.ipSalt).digest('hex').slice(0, 16)
 }

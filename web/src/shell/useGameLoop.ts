@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 
-// raf-schleife mit gedeckeltem zeitschritt, dt kommt in sekunden
 export function useGameLoop(step: (dt: number, now: number) => void, active: boolean) {
     const fn = useRef(step)
     fn.current = step
@@ -12,8 +11,6 @@ export function useGameLoop(step: (dt: number, now: number) => void, active: boo
         let last = performance.now()
 
         const tick = (now: number) => {
-            // nach einem tab-wechsel liegen sekunden zwischen den frames, ungedeckelt
-            // springt jedes spiel durch die halbe welt
             const dt = Math.min((now - last) / 1000, 0.1)
             last = now
             fn.current(dt, now)

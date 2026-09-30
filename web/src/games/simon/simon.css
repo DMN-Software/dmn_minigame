@@ -26,7 +26,6 @@
     padding: 0;
     border: 0;
     cursor: pointer;
-    /* nur der farbwechsel beim aufleuchten, sonst springt die scheibe */
     transition: background-color .09s linear;
 }
 .simon__pad:active { box-shadow: inset 0 0 30px rgba(0, 0, 0, .4); }

@@ -1,8 +1,6 @@
 export const TICK_HZ = 60
 export const TICK = 1 / TICK_HZ
 
-// ein lauf laenger als eine halbe stunde ist kein lauf mehr, und die wiederholung
-// auf dem server soll ein festes budget haben
 export const MAX_TICKS = TICK_HZ * 60 * 30
 export const MAX_LOG = 120000
 export const MAX_PICK = 4095
@@ -20,11 +18,7 @@ export const BIT: Record<Action, number> = {
 
 export type Input = {
     held: number
-    // nur was in genau diesem tick dazugekommen ist
     pressed: number
-    // spielabhaengiger kanal, gilt nur fuer diesen tick, sonst -1. klickspiele legen hier
-    // das gewaehlte feld ab, schlaegerspiele die zielposition in tausendsteln - die aber
-    // hoechstens jeden vierten tick, sonst blaeht dauernde mausbewegung das protokoll auf.
     pick: number
 }
 
@@ -32,15 +26,11 @@ export type Sim = {
     step(input: Input): void
     score: number
     over: boolean
-    // zaehlt hoch, sobald sich sichtbar etwas geaendert hat. nur die dom-spiele brauchen
-    // das, damit react nicht jeden tick neu rendert, die wiederholung ignoriert es.
     rev?: number
 }
 
 export type Rng = () => number
 
-// mulberry32: nur ganzzahlige operationen und eine division, damit client und server
-// bitgleich rechnen. Math.random waere hier toedlich, die wiederholung muesste scheitern.
 export function makeRng(seed: number): Rng {
     let a = seed >>> 0
     return () => {
@@ -67,8 +57,6 @@ export function shuffle<T>(rng: Rng, items: T[]): T[] {
     return out
 }
 
-// tripel [tick, held, pick]. ein eintrag entsteht nur bei einer aenderung, ein lauf ueber
-// minuten bleibt damit ein paar hundert zahlen gross.
 export type Log = number[]
 
 export class Recorder {
@@ -96,7 +84,6 @@ export function replay(create: (rng: Rng) => Sim, seed: number, log: Log): Repla
         if (tick < 0 || tick > MAX_TICKS) return { ok: false, reason: 'log' }
         if (held < 0 || held > 63) return { ok: false, reason: 'log' }
         if (pick < -1 || pick > MAX_PICK) return { ok: false, reason: 'log' }
-        // streng aufsteigend, sonst liesse sich derselbe tick mehrfach bespielen
         if (i > 0 && tick <= log[i - 3]) return { ok: false, reason: 'log' }
     }
 

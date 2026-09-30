@@ -9,7 +9,6 @@ export const CX = W - 26
 export const HALF = 4
 export const WIN = 11
 
-// tempi in pixeln je tick
 const PLAYER_SPEED = 420 / 60
 const CPU_SPEED = 230 / 60
 const BASE = 280 / 60
@@ -20,8 +19,6 @@ const AIM = 20
 const WIDE_AIM = 40
 const SERVE_WAIT = 42
 
-// der abpraller laeuft ueber das verhaeltnis vy/vx statt ueber einen winkel, sin und cos
-// sind zwischen den js-engines nicht bitgleich
 const SPREAD = 1.03
 const MIN_SPREAD = 0.12
 
@@ -44,8 +41,6 @@ export function createPong(rng: Rng): PongSim {
     let target = -1
 
     function aimError(): number {
-        // meist zielt er nur knapp daneben. ohne die seltenen ausreisser kommt er an jeden
-        // flachen ball heran und der ballwechsel hoert nie auf
         return (rng() * 2 - 1) * (rng() < 0.06 ? WIDE_AIM : AIM)
     }
 
@@ -61,9 +56,7 @@ export function createPong(rng: Rng): PongSim {
 
     function hit(paddleY: number, dir: number) {
         const off = Math.max(-1, Math.min(1, (sim.by - paddleY) / (PADDLE_H / 2)))
-        // ganz flache baelle laufen sonst ewig auf derselben hoehe hin und her
         const r = Math.abs(off) < 0.12 ? (sim.by < H / 2 ? MIN_SPREAD : -MIN_SPREAD) : off * SPREAD
-        // jeder schlagabtausch wird schneller, sonst enden lange ballwechsel nie
         const speed = Math.min(BASE + rally * RALLY_STEP, MAX_SPEED)
         rally += 1
         const len = Math.sqrt(r * r + 1)
@@ -110,7 +103,6 @@ export function createPong(rng: Rng): PongSim {
             if (input.pick >= 0) target = input.pick
             const dir = (input.held & BIT.down ? 1 : 0) - (input.held & BIT.up ? 1 : 0)
             if (dir !== 0) {
-                // sonst zieht ein liegengebliebener zeiger den schlaeger wieder zurueck
                 target = -1
                 sim.py += dir * PLAYER_SPEED
             } else if (target >= 0) {
@@ -119,7 +111,6 @@ export function createPong(rng: Rng): PongSim {
             }
             sim.py = Math.max(PADDLE_H / 2, Math.min(H - PADDLE_H / 2, sim.py))
 
-            // der rechner zielt nur grob und kommt bei steilen baellen nicht hinterher
             const chase = vx > 0 && sim.bx > W * 0.35
             const goal = chase ? sim.by + aim : H / 2
             const reach = CPU_SPEED * (chase ? 1 : 0.5)

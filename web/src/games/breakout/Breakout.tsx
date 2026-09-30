@@ -25,15 +25,12 @@ const WALL = 6
 const BIG = '800 22px system-ui, -apple-system, "Segoe UI", sans-serif'
 const SMALL = '800 14px system-ui, -apple-system, "Segoe UI", sans-serif'
 
-// letzte ballpositionen fuer den nachzieheffekt, reine anzeige und ausserhalb der simulation
 const trail: number[] = []
 
 function draw(ctx: CanvasRenderingContext2D, s: BreakoutSim) {
     ctx.fillStyle = BG
     ctx.fillRect(0, 0, W, H)
 
-    // die steine werden um einen pixel groesser gezeichnet, damit von den vier pixeln
-    // abstand der simulation die zwei pixel fuge des automaten uebrig bleiben
     for (let i = 0; i < s.bricks.length; i++) {
         if (!s.bricks[i]) continue
         const row = (i / COLS) | 0
@@ -86,7 +83,6 @@ export default function Breakout(props: GameProps) {
         props,
         canvas,
         draw,
-        // hoechstens jeden vierten tick, sonst blaeht dauernde mausbewegung das protokoll auf
         sample: (c, tick) => {
             if (tick % 4 !== 0) return -1
             const p = c.pointer()

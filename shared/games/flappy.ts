@@ -8,7 +8,6 @@ export const BIRD_X = 104
 export const BIRD_R = 11
 
 const SPACING = 184
-// die alten px/s-werte durch 60 geteilt, gerechnet wird in einheiten je tick
 const GRAVITY = 1250 / 3600
 const FLAP = -352 / 60
 const SPEED = 134 / 60
@@ -29,13 +28,11 @@ export function createFlappy(rng: Rng): FlappySim {
     let speed = SPEED
 
     function addPipe(score: number) {
-        // die luecke schrumpft mit dem punktestand, bleibt aber ueber vier vogelhoehen
         const half = Math.max(52, 76 - score * 1.1)
         const min = half + 46
         const max = H - GROUND - half - 34
         const last = pipes[pipes.length - 1]
         let y = min + rng() * (max - min)
-        // mehr als 150 px hoehenunterschied zur vorigen luecke schafft der vogel nicht rechtzeitig
         if (last) y = Math.max(last.y - 150, Math.min(last.y + 150, y))
         pipes.push({ x: last ? last.x + SPACING : W + 90, y, half, passed: false })
     }
@@ -56,7 +53,6 @@ export function createFlappy(rng: Rng): FlappySim {
                 sim.vy = FLAP
             }
 
-            // vor dem ersten flattern faellt nichts, sonst ist man beim laden schon tot
             if (!sim.started) return
 
             sim.vy += GRAVITY

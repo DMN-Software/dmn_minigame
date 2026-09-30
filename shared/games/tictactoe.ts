@@ -1,9 +1,7 @@
 import type { Input, Rng, Sim } from '../engine.ts'
 import { aiMove, emptyBoard, judge, type Board, type Player, type Result } from './minimax.ts'
 
-// ein perfekter gegner ist unschlagbar und damit langweilig, also patzt er ab und zu
 const SLIP = 0.2
-// bedenkzeit und standzeit der gewinnlinie in ticks, 60 ticks sind eine sekunde
 const THINK = 20
 const NEXT_ROUND = 54
 

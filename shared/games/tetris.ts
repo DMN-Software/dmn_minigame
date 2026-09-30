@@ -42,7 +42,6 @@ function build(color: string, rows: string[]): Piece {
     return { color, rotations }
 }
 
-// die kaesten sind quadratisch, damit das drehen ohne sonderfaelle auskommt
 export const PIECES: Piece[] = [
     build('#38bdf8', ['....', 'xxxx', '....', '....']),
     build('#fbbf24', ['xx', 'xx']),
@@ -64,10 +63,8 @@ export type Active = { piece: number; rot: number; x: number; y: number }
 export type TetrisSim = Sim & {
     score: number
     over: boolean
-    // index in PIECES, -1 fuer leer
     grid: number[]
     active: Active
-    // hoehe, auf der das stueck landen wuerde
     ghost: number
     next: number
     lines: number
@@ -101,7 +98,6 @@ export function createTetris(rng: Rng): TetrisSim {
     }
 
     function spin() {
-        // ohne wandkick: passt die drehung nicht, bleibt das stueck einfach stehen
         const a: Active = { ...sim.active, rot: (sim.active.rot + 1) % 4 }
         if (!collides(a)) sim.active = a
     }
@@ -172,7 +168,6 @@ export function createTetris(rng: Rng): TetrisSim {
             if (input.pressed & BIT.up) spin()
             if (input.pressed & BIT.down && move(0, 1)) fall = 0
 
-            // 54 ticks bei level 1, je level knapp fuenf weniger, unten bei 5 gedeckelt
             const every = Math.max(5, Math.round(54 - (sim.level - 1) * 4.8))
             let landed = false
 

@@ -1,9 +1,5 @@
 name: dmn-minigame
 
-# die dienste heissen absichtlich minigames-*: compose vergibt den dienstnamen immer
-# zusaetzlich als netz-alias. hiessen sie web und api, stuenden diese namen im geteilten
-# netz doppelt - der caddy des nachbarstacks kennt sie dort schon - und das docker-dns
-# loeste sie nichtdeterministisch auf.
 services:
   minigames-api:
     build:
@@ -44,7 +40,6 @@ volumes:
   api-data:
 
 networks:
-  # von hand angelegt, der caddy des nachbarstacks wird zusaetzlich hier eingehaengt
   edge:
     name: minigame_edge
     external: true

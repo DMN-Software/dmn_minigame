@@ -4,7 +4,6 @@ import { useCanvas } from '../../shell/useCanvas.ts'
 import { useSim } from '../../shell/useSim.ts'
 import type { GameProps } from '../../shell/types.ts'
 
-// vy zaehlt je tick, die neigung war auf px je sekunde geeicht
 const TILT = 620 / 60
 const TAU = Math.PI * 2
 
@@ -117,7 +116,6 @@ function drawBird(ctx: CanvasRenderingContext2D, s: FlappySim, t: number) {
     ctx.strokeStyle = OUTLINE
     ctx.stroke()
 
-    // fluegelschlag laeuft ueber die uhr, der zustand kennt keine phase
     const wing = Math.sin(t * 11) * 3.5
     ctx.beginPath()
     ctx.ellipse(-3, 1 + wing, 7, 4.5, 0, 0, TAU)

@@ -6,8 +6,6 @@ import type { GameProps } from '../../shell/types.ts'
 const CELL = 30
 const W = COLS * CELL
 const H = ROWS * CELL
-// die seitenspalte liegt neben dem brunnen, sonst verdeckt der vorschaukasten das
-// fallende stueck
 const SIDE = 132
 const FULL_W = W + SIDE
 
@@ -15,7 +13,6 @@ const BG = '#0b0b12'
 const GRID = 'rgba(255, 255, 255, .045)'
 const FRAME = '#dfe4ee'
 const SHINE = 'rgba(255, 255, 255, .75)'
-// reihenfolge wie in PIECES: I O T S Z J L
 const FILL = ['#31c7ef', '#f7d308', '#ad4d9c', '#42b642', '#ef2029', '#5a65ad', '#ef7921']
 const EDGE = ['#1b7d96', '#9c8605', '#6d2f63', '#2a742a', '#961419', '#39406e', '#984c15']
 

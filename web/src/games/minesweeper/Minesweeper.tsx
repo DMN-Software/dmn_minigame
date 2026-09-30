@@ -6,7 +6,6 @@ import type { GameProps } from '../../shell/types.ts'
 import './minesweeper.css'
 
 const HOLD = 400
-// kopfzeile und die fasen ringsum gehen von der hoehe ab, bevor das raster geteilt wird
 const CHROME = 76
 
 const SEGMENTS: [string, number, number, number, number][] = [
@@ -83,7 +82,6 @@ export default function Minesweeper(props: GameProps) {
 
     const busy = props.paused || sim.over
 
-    // gerade meldung deckt auf, ungerade setzt die flagge
     const down = (i: number, button: number) => {
         if (button !== 0 || busy) return
         skip.current = false
@@ -107,7 +105,6 @@ export default function Minesweeper(props: GameProps) {
     let left = MINES
     for (const c of sim.cells) if (c.flag) left -= 1
 
-    // ganze pixel je feld, sonst franst das relief der fasen aus
     const cell = Math.max(16, Math.floor((size - CHROME) / COLS))
     const board = cell * COLS
 
@@ -131,8 +128,6 @@ export default function Minesweeper(props: GameProps) {
                                 onPointerCancel={abort}
                                 onContextMenu={(e) => {
                                     e.preventDefault()
-                                    // beim halten auf dem touchscreen kommt contextmenu hinterher,
-                                    // die flagge liegt dann schon
                                     if (skip.current || busy) return
                                     abort()
                                     props.controls.choose(i * 2 + 1)

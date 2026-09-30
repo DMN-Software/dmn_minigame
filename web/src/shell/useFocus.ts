@@ -1,7 +1,5 @@
 import { useEffect } from 'react'
 
-// in cef bekommt das iframe tastendruecke nur mit fokus, und der geht bei jedem klick
-// daneben verloren
 export function useFocus() {
     useEffect(() => {
         const grab = () => {

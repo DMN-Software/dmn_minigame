@@ -62,7 +62,6 @@ export function createSnake(rng: Rng): SnakeSim {
             if (head.x === sim.food.x && head.y === sim.food.y) {
                 sim.score += 1
                 sim.food = spawn()
-                // alle vier futter ein tick schneller, unter vier ticks je feld waere es unfair
                 if (sim.score % 4 === 0 && every > 4) every -= 1
             } else {
                 body.pop()

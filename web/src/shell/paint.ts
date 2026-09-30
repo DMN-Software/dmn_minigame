@@ -1,6 +1,3 @@
-// gemeinsames handwerkszeug fuer die canvas-spiele. rendering ist frei von der
-// simulation, hier darf also auch die uhr benutzt werden.
-
 export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
     const rad = Math.min(r, w / 2, h / 2)
     ctx.beginPath()
@@ -22,8 +19,6 @@ export function fillRound(ctx: CanvasRenderingContext2D, x: number, y: number, w
     ctx.fill()
 }
 
-// leuchten kostet in cef spuerbar, deshalb nur um die wenigen elemente legen,
-// auf die es ankommt, und danach wieder abschalten
 export function glow(ctx: CanvasRenderingContext2D, color: string, blur: number, draw: () => void) {
     ctx.save()
     ctx.shadowColor = color
@@ -46,8 +41,6 @@ export function verticalFade(
     return g
 }
 
-// hintergrund fuer jedes canvas-spiel: dunkler verlauf plus feines raster,
-// damit die flaeche nicht als schwarzes loch wirkt
 export function backdrop(ctx: CanvasRenderingContext2D, w: number, h: number, grid = 30) {
     ctx.fillStyle = verticalFade(ctx, 0, 0, h, '#121722', '#0a0d13')
     ctx.fillRect(0, 0, w, h)

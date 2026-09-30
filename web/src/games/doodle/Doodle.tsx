@@ -27,7 +27,6 @@ function drawPaper(ctx: CanvasRenderingContext2D, cam: number) {
         ctx.moveTo(x, 0)
         ctx.lineTo(x, H)
     }
-    // das karo haengt an der welt, sonst steht der block beim scrollen still
     const start = ((-cam % GRID) + GRID) % GRID
     for (let y = start; y < H; y += GRID) {
         ctx.moveTo(0, y)
@@ -55,7 +54,6 @@ function drawFigure(ctx: CanvasRenderingContext2D, x: number, y: number) {
     ctx.fill()
     ctx.stroke()
 
-    // ruessel nach rechts, daran erkennt man die figur ueberhaupt erst
     ctx.beginPath()
     ctx.moveTo(x + 4, y - 1)
     ctx.quadraticCurveTo(x + 16, y - 2, x + 15, y + 5)

@@ -47,8 +47,6 @@ export function GameHost({ id, params, onBack }: { id: GameId; params: Params; o
         setPending(null)
         setPhase('wait')
 
-        // der server gibt den startwert aus und merkt sich ihn zur sitzung. ohne ihn
-        // laesst sich der lauf nicht nachspielen, dann gibt es eben keinen eintrag.
         try {
             const s = await api.session(id)
             token.current = s.token

@@ -20,8 +20,6 @@ function Key({ action, label, cls, onPress }: { action: Action; label: string; c
     )
 }
 
-// nur fuer dpad und tap. schlaeger folgen dem zeiger, klickgesteuerte spiele brauchen
-// ohnehin nichts.
 export function Pad({ scheme, onPress }: Props) {
     if (scheme === 'dpad') {
         return (

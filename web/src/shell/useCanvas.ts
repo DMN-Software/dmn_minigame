@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react'
 
-// feste logische aufloesung: gezeichnet wird in einheiten von 0..width und 0..height,
-// skaliert wird hier. ein spiel darf die transformation nicht selbst zuruecksetzen.
 export function useCanvas(width: number, height: number) {
     const ref = useRef<HTMLCanvasElement | null>(null)
 
@@ -14,7 +12,6 @@ export function useCanvas(width: number, height: number) {
             const rect = box.getBoundingClientRect()
             if (rect.width < 1 || rect.height < 1) return
 
-            // groesstmoegliche flaeche im eltern-element, seitenverhaeltnis bleibt erhalten
             const scale = Math.min(rect.width / width, rect.height / height)
             const w = Math.floor(width * scale)
             const h = Math.floor(height * scale)

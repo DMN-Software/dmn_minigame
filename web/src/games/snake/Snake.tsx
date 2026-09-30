@@ -41,7 +41,6 @@ function drawHead(ctx: CanvasRenderingContext2D, s: SnakeSim) {
     ctx.fillStyle = INK
     ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2)
 
-    // blickrichtung steckt nicht im zustand, ergibt sich aber aus dem naechsten glied
     const dx = neck ? Math.sign(head.x - neck.x) : 1
     const dy = neck ? Math.sign(head.y - neck.y) : 0
     const cx = x + CELL / 2

@@ -1,8 +1,6 @@
 import { shuffle, type Input, type Rng, type Sim } from '../engine.ts'
 
-// acht paare auf sechzehn karten, die motive dazu liegen im renderer
 const PAIRS = 8
-// 700 ms, sonst ist die zweite karte weg, bevor man sie gelesen hat
 const HOLD = 42
 
 export type Card = { id: number; sym: number }
@@ -48,7 +46,6 @@ export function createMemory(rng: Rng): MemorySim {
         step(input: Input) {
             if (sim.over) return
 
-            // solange zwei karten offen liegen, laeuft nur die wartezeit
             if (hold > 0) {
                 hold -= 1
                 if (hold === 0) settle()

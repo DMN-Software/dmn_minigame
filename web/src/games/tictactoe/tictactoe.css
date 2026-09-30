@@ -91,7 +91,6 @@
 .ttt__cell--x::before { transform: rotate(45deg); }
 .ttt__cell--x::after { transform: rotate(-45deg); }
 
-/* der ring kommt aus dem verlauf, weil border-width keine prozente kennt */
 .ttt__cell--o::before {
     content: '';
     position: absolute;

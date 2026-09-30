@@ -14,12 +14,9 @@ export const PADDLE_H = 10
 export const PADDLE_Y = H - 26
 export const R = 5
 
-// tempi in pixeln je tick
 const PADDLE_SPEED = 620 / 60
 const BASE = 210 / 60
 
-// abpraller laufen ueber das verhaeltnis vx/vy, nicht ueber einen winkel: sin und cos
-// sind zwischen den js-engines nicht bitgleich und die wiederholung wuerde auseinanderlaufen
 const SERVE_SPREAD = 0.73
 const PADDLE_SPREAD = 1.75
 
@@ -73,7 +70,6 @@ export function createBreakout(rng: Rng): BreakoutSim {
             if (sim.y + R < by || sim.y - R > by + BRICK_H) continue
 
             sim.bricks[i] = false
-            // die flachere ueberdeckung verraet, ueber welche kante der ball gekommen ist
             const ox = Math.min(sim.x + R - bx, bx + BRICK_W - (sim.x - R))
             const oy = Math.min(sim.y + R - by, by + BRICK_H - (sim.y - R))
             if (ox < oy) vx = -vx
@@ -126,7 +122,6 @@ export function createBreakout(rng: Rng): BreakoutSim {
             if (input.pick >= 0) target = input.pick
             const dir = (input.held & BIT.right ? 1 : 0) - (input.held & BIT.left ? 1 : 0)
             if (dir !== 0) {
-                // sonst zieht ein liegengebliebener zeiger den schlaeger wieder zurueck
                 target = -1
                 sim.px += dir * PADDLE_SPEED
             } else if (target >= 0) {
@@ -142,7 +137,6 @@ export function createBreakout(rng: Rng): BreakoutSim {
                 launch()
             }
 
-            // bei hohem tempo passt der ball sonst zwischen zwei ticks durch einen stein
             const steps = Math.max(1, Math.ceil(Math.sqrt(vx * vx + vy * vy) / 4))
             for (let i = 0; i < steps; i++) {
                 sim.score += advance(steps)

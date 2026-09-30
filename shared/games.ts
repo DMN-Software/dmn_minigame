@@ -21,8 +21,6 @@ export type GameMeta = {
     scheme: Scheme
 }
 
-// angelehnt an die vorbilder, aber bewusst nicht deren namen: tetris, memory, pong,
-// breakout und simon sind eingetragene marken, und das repo ist oeffentlich
 export const GAMES: GameMeta[] = [
     { id: 'snake', title: 'Snaker', hint: 'Sammeln, ohne dich selbst zu treffen', scheme: 'dpad' },
     { id: 'flappy', title: 'Flapper', hint: 'Tippen hält dich oben', scheme: 'tap' },
@@ -54,11 +52,6 @@ export type Limit = {
     maxPerSecond: number
 }
 
-// grosszuegig ueber dem realistischen rekord angesetzt. der zweck ist nicht, gute spieler
-// auszubremsen, sondern offensichtliche fantasiewerte abzuweisen. die werte fuer paare,
-// blockstapler, turmbau und tischtennis stammen aus bot-simulationen gegen den echten
-// spielcode - zu eng gesetzt weisen sie genau die laeufe ab, die in die liste wollen.
-// nach ein paar wochen echten daten nachziehen, siehe docs/20_API.md.
 export const LIMITS: Record<GameId, Limit> = {
     snake: { maxScore: 500, minMs: 3000, maxPerSecond: 3 },
     flappy: { maxScore: 999, minMs: 2000, maxPerSecond: 1.5 },

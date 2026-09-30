@@ -5,10 +5,7 @@ import { env } from './env.ts'
 import { routes } from './routes.ts'
 
 const app = Fastify({
-    // nur dem docker-nachbarn glauben. mit true waere req.ip der linkeste X-Forwarded-For
-    // eintrag, also frei vom client waehlbar, und jedes ratelimit umgehbar.
     trustProxy: 'uniquelocal',
-    // das eingabeprotokoll eines langen laufs sind bis zu MAX_LOG ganze zahlen
     bodyLimit: 1_500_000,
     logger: {
         serializers: {
@@ -31,7 +28,6 @@ app.setNotFoundHandler((_req, reply) => reply.code(404).send({ error: 'not_found
 await app.register(rateLimit, { global: false, keyGenerator: (req) => ipHash(req.ip) })
 await app.register(routes, { prefix: '/api/v1' })
 
-// der timer darf den prozess nicht am leben halten
 setInterval(pruneSessions, 10 * 60 * 1000).unref()
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {

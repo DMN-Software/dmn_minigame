@@ -19,7 +19,6 @@ const useSession = db.prepare('UPDATE sessions SET used_at = ? WHERE token = ? A
 const insertScore = db.prepare(
     'INSERT INTO scores (game, name, score, duration_ms, created_at, ip_hash, ticks) VALUES (?, ?, ?, ?, ?, ?, ?)',
 )
-// bester lauf je name, sonst belegt ein einziger spieler die ganze liste
 const bestPerName = db.prepare(`
     SELECT name, MAX(score) AS score, created_at AS at
     FROM scores WHERE game = ? GROUP BY name ORDER BY score DESC, at ASC LIMIT ?
@@ -87,16 +86,12 @@ export async function routes(app: FastifyInstance) {
             const checked = checkName(req.body.name)
             if (!checked.ok) return bad(reply, 'bad_name', checked.message)
 
-            // der client schickt keine punktzahl. sie entsteht hier, indem der lauf mit
-            // demselben startwert und demselben eingabeprotokoll nachgespielt wird.
             const game = session.game as GameId
             const result = replay(SIMS[game], session.seed, log)
             if (!result.ok) return bad(reply, 'bad_run', 'Lauf nicht nachvollziehbar')
 
             const score = result.score
             const durationMs = Math.round((result.ticks / TICK_HZ) * 1000)
-            // fangnetz, falls ein spiel doch eine luecke hat. die wiederholung ist die
-            // eigentliche pruefung, hier bleibt nur noch das offensichtliche haengen.
             if (score > LIMITS[game].maxScore) return bad(reply, 'score_range', 'Punktzahl unglaubwürdig')
             if (durationMs > now - session.started_at) return bad(reply, 'bad_run', 'Lauf nicht nachvollziehbar')
 
