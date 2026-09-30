@@ -2,7 +2,6 @@ import { randInt, type Input, type Rng, type Sim } from '../engine.ts'
 
 export const PADS = 4
 
-// 420 ms vorlauf, 620 ms pause bis die folge waechst, 180 ms leuchten beim antippen
 const LEAD = 25
 const GROW = 37
 const FLASH = 11
@@ -16,7 +15,6 @@ export type SimonSim = Sim & {
     lit: number
 }
 
-// 640 ms je glied, pro folgenlaenge 25 ms schneller. unter 250 ms merkt sich das keiner.
 function gapFor(len: number) {
     return Math.max(15, 38 - Math.floor((len * 3) / 2))
 }
@@ -87,7 +85,6 @@ export function createSimon(rng: Rng): SimonSim {
             sim.rev += 1
 
             if (seq[pos] !== pad) {
-                // die punktzahl steht schon auf der zuletzt geschafften laenge
                 sim.over = true
                 return
             }

@@ -19,7 +19,6 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* korn wie auf dmn-software.com. die spielflaeche liegt darueber, siehe .stage */
 body::after {
     content: '';
     position: fixed;
@@ -66,8 +65,6 @@ button {
     min-height: 0;
 }
 
-/* spielansicht */
-
 .hud {
     display: flex;
     align-items: center;
@@ -110,7 +107,6 @@ button {
     line-height: 20px;
     letter-spacing: -.01em;
     white-space: nowrap;
-    /* zwischen 480 und etwa 540 px breite schiebt der titel sonst den pause-knopf aus dem bild */
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -139,7 +135,6 @@ button {
 
 .stage {
     position: relative;
-    /* ueber dem korn, die spiele bleiben so, wie sie gezeichnet werden */
     z-index: 91;
     display: grid;
     place-items: center;
@@ -157,7 +152,6 @@ button {
     height: 100%;
     min-width: 0;
     min-height: 0;
-    /* useCanvas misst dieses element, deshalb darf es nicht am inhalt wachsen */
     overflow: hidden;
 }
 
@@ -316,8 +310,6 @@ button {
 .pad__key:active { border-color: var(--red); background: rgba(225, 29, 46, .3); color: var(--white); }
 .pad__fire { width: 72px; height: 72px; border-radius: 50%; }
 
-/* auswahl */
-
 .menu {
     height: 100%;
     overflow-y: auto;
@@ -360,7 +352,6 @@ button {
     padding-bottom: 18px;
 }
 
-/* als eigenes element, damit die linie beim ersten aufruf von links einlaufen kann */
 .menu__head::after {
     content: '';
     position: absolute;
@@ -382,7 +373,6 @@ button {
 .menu__head h1 span { display: block; }
 .menu__head p { margin: 0; color: var(--muted); }
 
-/* kleine iframes: kopf und ueberschrift duerfen die liste nicht aus dem bild schieben */
 @media (max-height: 420px) {
     .top__in { height: 40px; }
     .brand { gap: 8px; font-size: 15px; }
@@ -436,7 +426,6 @@ button {
     letter-spacing: -.01em;
 }
 
-/* die leitfarbe des vorbilds, bewusst klein: die seite hat nur ein rot als akzent */
 .game__dot {
     display: inline-block;
     width: 7px;
@@ -514,7 +503,6 @@ button {
     from { opacity: 0; transform: translateY(6px) scale(.98); }
 }
 
-/* maske wie auf der startseite: der clip wandert mit dem translate, sichtbar bleibt nur die zeile */
 @keyframes line-up {
     from { transform: translateY(110%); clip-path: inset(-.3em -.3em 110% -.3em); }
     to { clip-path: inset(-.3em); }

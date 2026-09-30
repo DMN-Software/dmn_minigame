@@ -8,7 +8,6 @@ export const BASE_Y = H - 96
 
 const BASE_W = 168
 const VIEW = 152
-// die alten px/s-werte durch 60 geteilt, gerechnet wird in einheiten je tick
 const FALL = 1150 / 60
 const SPEED = 148 / 60
 const SPEED_MAX = 330 / 60
@@ -54,7 +53,6 @@ export function createTower(rng: Rng): TowerSim {
                     const left = Math.max(top.x, sim.cur.x)
                     const right = Math.min(top.x + top.w, sim.cur.x + sim.cur.w)
 
-                    // unter zwei pixel bleibt nichts stehen, worauf der naechste block passt
                     if (right - left < 2) {
                         sim.over = true
                         return
@@ -68,7 +66,6 @@ export function createTower(rng: Rng): TowerSim {
                     sim.cur = hover(placed)
                 }
             } else {
-                // hin und her ohne sinus, die richtung kippt am rand
                 sim.cur.x += dir * speed
                 if (sim.cur.x <= 0) {
                     sim.cur.x = 0

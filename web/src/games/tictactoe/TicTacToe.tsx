@@ -10,7 +10,6 @@ function cellClass(mark: Player | null): string {
     return mark === 'X' ? 'ttt__cell ttt__cell--x' : 'ttt__cell ttt__cell--o'
 }
 
-// die felder einer linie stehen aufsteigend, ihr abstand verraet die richtung
 function winClass(result: Result): string {
     const [a, b] = result.line
     const cls = 'ttt__win ttt__win--' + (result.winner === 'X' ? 'x' : 'o')

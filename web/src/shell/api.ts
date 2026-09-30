@@ -25,7 +25,6 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
     session: (game: GameId) => call<SessionResponse>('/session', { method: 'POST', body: JSON.stringify({ game }) }),
 
-    // die punktzahl steht bewusst nicht drin, die rechnet der server aus dem protokoll
     submit: (token: string, name: string, log: Log) =>
         call<ScoreResponse>('/score', { method: 'POST', body: JSON.stringify({ token, name, log }) }),
 

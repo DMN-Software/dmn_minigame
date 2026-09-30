@@ -17,7 +17,6 @@
 
 .mem__card {
     min-width: 0;
-    /* schmaler als hoch, damit die kacheln wie spielkarten stehen */
     padding: 0 3%;
     border: 0;
     background: none;

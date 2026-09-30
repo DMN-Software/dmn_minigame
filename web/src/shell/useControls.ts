@@ -7,7 +7,6 @@ const KEYS: Record<string, Action> = {
     ArrowDown: 'down',
     ArrowLeft: 'left',
     ArrowRight: 'right',
-    // wasd liegt daneben, weil in cef die pfeiltasten je nach build vom spiel geschluckt werden
     KeyW: 'up',
     KeyS: 'down',
     KeyA: 'left',
@@ -24,7 +23,6 @@ const SWIPE_MIN = 24
 
 type Store = {
     held: number
-    // was seit dem letzten tick gedrueckt wurde, aber schon wieder los ist
     latched: number
     pick: number
     pointer: { x: number; y: number } | null
@@ -50,8 +48,6 @@ export function useControls(stage: RefObject<HTMLElement | null>, active: boolea
                 s.pick = -1
                 return p
             },
-            // bildschirmpad und wischgesten sind nur ein kurzer impuls, der bis zum
-            // naechsten tick ueberleben muss
             tap(a) {
                 s.latched |= BIT[a]
             },

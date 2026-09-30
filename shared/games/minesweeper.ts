@@ -13,7 +13,6 @@ export type Cell = {
 
 export type MinesweeperSim = Sim & {
     cells: Cell[]
-    // feld, auf dem der lauf geendet hat, sonst -1
     boom: number
 }
 
@@ -47,8 +46,6 @@ export function createMinesweeper(rng: Rng): MinesweeperSim {
     let rev = 0
     let armed = false
 
-    // erst nach dem ersten klick verteilen, sonst ist der einstieg gluecksache. das feld
-    // und seine nachbarn bleiben frei, damit der erste klick gleich eine flaeche oeffnet
     function fill(safe: number) {
         const banned = neighbors(safe)
         banned.push(safe)
@@ -129,7 +126,6 @@ export function createMinesweeper(rng: Rng): MinesweeperSim {
             if (over || input.pick < 0 || input.pick >= COLS * ROWS * 2) return
 
             const i = input.pick >> 1
-            // gerade meldung deckt auf, ungerade setzt die flagge
             if (input.pick % 2 === 0) {
                 dig(i)
                 return

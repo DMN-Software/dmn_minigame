@@ -11,7 +11,6 @@ export type Tile = {
     value: number
     born: boolean
     merged: boolean
-    // geschluckte kachel. faehrt den zug noch mit und liegt danach unter der neuen.
     gone: boolean
 }
 

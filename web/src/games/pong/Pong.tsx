@@ -11,7 +11,6 @@ const DIGIT_H = 54
 const STROKE = 9
 const DIGIT_GAP = 12
 
-// segmente a b c d e f g als bits, wie auf den ziffernanzeigen des originals
 const SEGMENTS = [0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f]
 
 function digit(ctx: CanvasRenderingContext2D, n: number, x: number, y: number) {
@@ -61,7 +60,6 @@ export default function Pong(props: GameProps) {
         props,
         canvas,
         draw,
-        // hoechstens jeden vierten tick, sonst blaeht dauernde mausbewegung das protokoll auf
         sample: (c, tick) => {
             if (tick % 4 !== 0) return -1
             const p = c.pointer()

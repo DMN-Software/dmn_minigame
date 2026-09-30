@@ -19,9 +19,6 @@ const TOP_H = 6
 const SIDE_W = 8
 const CHIP_FALL = 620
 
-// der abgesaegte streifen lebt nur im bild, der zustand kennt ihn nicht mehr.
-// aus zwei benachbarten bloecken laesst sich seine breite ableiten, den startzeitpunkt
-// liefert der wechsel der stapelhoehe
 let chip: { x: number; w: number; y: number; idx: number; at: number } | null = null
 let seen = 0
 

@@ -4,14 +4,12 @@ const LEET: Record<string, string> = {
     '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's',
 }
 
-// anstandspruefung, keine moderation. was durchrutscht, raeumt DELETE /scores/:id weg.
 const BLOCKED = [
     'arschloch', 'fick', 'fotze', 'hure', 'missgeburt', 'nutte', 'scheis', 'schlampe', 'wichs',
     'asshole', 'bitch', 'cunt', 'fuck', 'nigga', 'nigger', 'shit', 'whore',
     'hitler', 'nazi', 'siegheil', 'hakenkreuz',
 ]
 
-// leetspeak zurueckdrehen und alles ausser buchstaben werfen, damit "H1tl3r" und "f u c k" haengen bleiben
 function flatten(name: string): string {
     return name
         .normalize('NFKD')
@@ -21,8 +19,6 @@ function flatten(name: string): string {
         .replace(/[^a-z]/g, '')
 }
 
-// hangul-fueller zaehlen als \p{L}, rendern aber als leerraum - damit liesse sich die
-// liste mit optisch identischen leerzeilen zumuellen
 const BLANKS = /[ᅟᅠㅤﾠ]/
 
 export type NameCheck = { ok: true; name: string } | { ok: false; message: string }

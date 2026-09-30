@@ -2,8 +2,6 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { GAMES, type GameId, type Scheme } from '../../../shared/games.ts'
 import { prefetch } from './registry.ts'
 
-// je spiel die leitfarbe seines vorbilds, damit die auswahl nicht aus zwoelf
-// gleichen grauen zeilen besteht
 const ACCENT: Record<GameId, string> = {
     snake: '#9ead86',
     flappy: '#4ec0ca',
@@ -26,10 +24,8 @@ const INPUT: Record<Scheme, string> = {
     pointer: 'Klicken',
 }
 
-// im iframe der fivem-resource wuerde der link das spiel durch die startseite ersetzen
 const framed = window.self !== window.top
 
-// die einblendung nur beim ersten aufruf, nach jedem zurueck aus einem spiel stoert sie
 let intro = true
 
 export function Menu({ onPick }: { onPick: (id: GameId) => void }) {

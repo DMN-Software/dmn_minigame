@@ -3,8 +3,6 @@ import type { Log } from './engine.ts'
 export const NAME_MIN = 2
 export const NAME_MAX = 16
 
-// buchstaben jeder sprache, ziffern, leerzeichen, punkt, unterstrich, bindestrich.
-// keine steuerzeichen, keine zero-width-zeichen, keine emojis.
 export const NAME_RE = /^[\p{L}\p{N} ._-]+$/u
 
 export type SessionResponse = { token: string; seed: number }
