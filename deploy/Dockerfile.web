@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS build
 WORKDIR /app
 
 COPY web/package.json web/package-lock.json ./web/
@@ -8,7 +8,7 @@ COPY shared/ ./shared/
 COPY web/ ./web/
 RUN cd web && npm run build
 
-FROM caddy:2-alpine
+FROM caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
 COPY --from=build /app/web/dist /srv
 COPY deploy/web.Caddyfile /etc/caddy/Caddyfile
 
