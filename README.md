@@ -157,12 +157,14 @@ Details: [docs/20_API.md](docs/20_API.md).
 
 Lokal ausführen ist zur Prüfung ausdrücklich erlaubt, siehe [LICENSE](LICENSE).
 
+API und Web laufen in zwei Terminals, beide vom Repo-Root aus:
+
 ```sh
-cd api && npm install
+cd api && npm install && npm test
 IP_SALT=$(openssl rand -hex 32) ADMIN_TOKEN=$(openssl rand -hex 32) DB_PATH=./data/dev.db node src/index.ts
+```
 
-cd api && npm test
-
+```sh
 cd web && npm install && npm run dev
 ```
 
