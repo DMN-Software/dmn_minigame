@@ -1,4 +1,4 @@
-import { randomBytes, randomInt } from 'node:crypto'
+import { createHash, randomBytes, randomInt, timingSafeEqual } from 'node:crypto'
 import type { FastifyInstance, FastifyReply } from 'fastify'
 import type { GameId } from '../../shared/games.ts'
 import { GAME_IDS, LIMITS } from '../../shared/games.ts'
@@ -28,6 +28,16 @@ const dropScore = db.prepare('DELETE FROM scores WHERE id = ?')
 function board(game: GameId, limit: number): ScoreRow[] {
     const rows = bestPerName.all(game, limit) as unknown as { name: string; score: number; at: number }[]
     return rows.map((row, i) => ({ rank: i + 1, name: row.name, score: row.score, at: row.at }))
+}
+
+function digest(token: string) {
+    return createHash('sha256').update(token).digest()
+}
+
+const adminDigest = digest(`Bearer ${env.adminToken}`)
+
+function isAdmin(header: string | undefined) {
+    return timingSafeEqual(digest(header ?? ''), adminDigest)
 }
 
 function bad(reply: FastifyReply, error: string, message: string) {
@@ -86,22 +96,18 @@ export async function routes(app: FastifyInstance) {
             const checked = checkName(req.body.name)
             if (!checked.ok) return bad(reply, 'bad_name', checked.message)
 
-            const game = session.game as GameId
-            const result = replay(SIMS[game], session.seed, log)
-            if (!result.ok) return bad(reply, 'bad_run', 'Lauf nicht nachvollziehbar')
+            if (useSession.run(now, token).changes !== 1) return bad(reply, 'session_used', 'Sitzung schon eingetragen')
 
-            const score = result.score
-            const durationMs = Math.round((result.ticks / TICK_HZ) * 1000)
+            const game = session.game as GameId
+            const run = replay(SIMS[game], session.seed, log)
+            if (!run.ok) return bad(reply, 'bad_run', 'Lauf nicht nachvollziehbar')
+
+            const score = run.score
+            const durationMs = Math.round((run.ticks / TICK_HZ) * 1000)
             if (score > LIMITS[game].maxScore) return bad(reply, 'score_range', 'Punktzahl unglaubwürdig')
             if (durationMs > now - session.started_at) return bad(reply, 'bad_run', 'Lauf nicht nachvollziehbar')
 
-            db.exec('BEGIN')
-            if (useSession.run(now, token).changes !== 1) {
-                db.exec('ROLLBACK')
-                return bad(reply, 'session_used', 'Sitzung schon eingetragen')
-            }
-            insertScore.run(game, checked.name, score, durationMs, now, ipHash(req.ip), result.ticks)
-            db.exec('COMMIT')
+            insertScore.run(game, checked.name, score, durationMs, now, ipHash(req.ip), run.ticks)
 
             const top = board(game, 10)
             const place = top.findIndex((row) => row.name === checked.name && row.score === score)
@@ -140,7 +146,7 @@ export async function routes(app: FastifyInstance) {
             config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
         },
         async (req, reply) => {
-            if (req.headers.authorization !== `Bearer ${env.adminToken}`) {
+            if (!isAdmin(req.headers.authorization)) {
                 return reply.code(401).send({ error: 'unauthorized', message: 'Nicht berechtigt' })
             }
             if (dropScore.run(req.params.id).changes !== 1) {

@@ -2,12 +2,12 @@ import { mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
 function required(key: string): string {
-    const value = process.env[key]
-    if (!value || value.length < 32) {
+    const secret = process.env[key]
+    if (!secret || secret.length < 32) {
         console.error(`${key} fehlt oder ist zu kurz, ohne die variable startet der dienst nicht`)
         process.exit(1)
     }
-    return value
+    return secret
 }
 
 export const env = {

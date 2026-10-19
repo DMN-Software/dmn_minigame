@@ -19,6 +19,8 @@ export const LOADERS: Record<GameId, Loader> = {
     doodle: () => import('../games/doodle/Doodle.tsx'),
 }
 
+function retryOnOpen() {}
+
 export function prefetch(id: GameId) {
-    void LOADERS[id]().catch(() => {})
+    void LOADERS[id]().catch(retryOnOpen)
 }

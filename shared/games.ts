@@ -48,21 +48,19 @@ export function gameMeta(id: GameId): GameMeta {
 
 export type Limit = {
     maxScore: number
-    minMs: number
-    maxPerSecond: number
 }
 
 export const LIMITS: Record<GameId, Limit> = {
-    snake: { maxScore: 500, minMs: 3000, maxPerSecond: 3 },
-    flappy: { maxScore: 999, minMs: 2000, maxPerSecond: 1.5 },
-    tictactoe: { maxScore: 999, minMs: 2000, maxPerSecond: 1 },
-    tower: { maxScore: 999, minMs: 2000, maxPerSecond: 4 },
-    g2048: { maxScore: 500000, minMs: 10000, maxPerSecond: 400 },
-    breakout: { maxScore: 9999, minMs: 5000, maxPerSecond: 20 },
-    minesweeper: { maxScore: 999, minMs: 4000, maxPerSecond: 20 },
-    memory: { maxScore: 800, minMs: 5000, maxPerSecond: 150 },
-    tetris: { maxScore: 999999, minMs: 10000, maxPerSecond: 3000 },
-    pong: { maxScore: 99, minMs: 10000, maxPerSecond: 1 },
-    simon: { maxScore: 200, minMs: 3000, maxPerSecond: 0.5 },
-    doodle: { maxScore: 99999, minMs: 3000, maxPerSecond: 200 },
+    snake: { maxScore: 500 },
+    flappy: { maxScore: 999 },
+    tictactoe: { maxScore: 999 },
+    tower: { maxScore: 999 },
+    g2048: { maxScore: 500000 },
+    breakout: { maxScore: 9999 },
+    minesweeper: { maxScore: 999 },
+    memory: { maxScore: 800 },
+    tetris: { maxScore: 999999 },
+    pong: { maxScore: 99 },
+    simon: { maxScore: 200 },
+    doodle: { maxScore: 99999 },
 }
