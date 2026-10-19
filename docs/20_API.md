@@ -1,6 +1,6 @@
 # Bestenliste
 
-Ein eigener Fastify-Dienst auf Node 24 mit `node:sqlite`. Kein Build-Schritt — Node führt die
+Ein eigener Fastify-Dienst auf Node 24 mit `node:sqlite`. Kein Build-Schritt, Node führt die
 TypeScript-Quellen direkt aus, gestartet wird mit `node src/index.ts`. Deshalb gilt im ganzen
 Ordner `api/`: **nur löschbare Syntax**, also kein `enum`, keine Parameter-Properties,
 Typ-Importe als `import type`, relative Importe mit `.ts`-Endung.
@@ -44,7 +44,7 @@ CREATE INDEX sessions_age ON sessions (started_at);
 
 Zeitstempel sind Unix-Millisekunden. `ip_hash` ist `sha256(ip + IP_SALT)` auf 16 Zeichen
 gekürzt; die rohe Adresse wird weder gespeichert noch geloggt. Alle zehn Minuten fallen
-eingelöste Sitzungen nach zehn Minuten und alle übrigen nach drei Stunden weg — die Gültigkeit
+eingelöste Sitzungen nach zehn Minuten und alle übrigen nach drei Stunden weg; die Gültigkeit
 beträgt ohnehin nur zwei. Der Timer ist `unref()`, damit er den Prozess nicht am Leben hält.
 
 `seed` und `ticks` kamen mit der zweiten Migration dazu, als die Punktzahl auf das Nachspielen
@@ -94,14 +94,19 @@ Damit das trägt, muss die Logik bitgleich rechnen. Die Regeln stehen in
 [10_RAHMEN.md](10_RAHMEN.md): kein `Math.random`, keine Uhrzeit, keine transzendenten
 Funktionen, kein Zugriff auf den Browser.
 
-**Was das leistet und was nicht.** Eine erfundene Punktzahl ist unmöglich — jeder Eintrag
+**Was das leistet und was nicht.** Eine erfundene Punktzahl ist unmöglich, jeder Eintrag
 entspricht einem echten, nachspielbaren Durchlauf. Ein Skript, das das Spiel selbst gut
 spielt, bleibt möglich; das lässt sich in einem Browserspiel nicht ausschließen und wäre auch
 mit Obfuskation oder Client-Signaturen nicht zu erreichen. Dagegen hilft nur der
 Löschendpunkt.
 
-Die Grenzwerte aus `shared/games.ts` bleiben als Fangnetz stehen, falls ein Spiel doch eine
-Lücke hat. Die eigentliche Prüfung ist die Wiederholung.
+Weil der Client den Startwert kennt, kann ein Skript bei Memoria, Minefinder und Sim Says das
+verdeckte Feld vorab ausrechnen: Kartenlage, Minen, die ganze Folge. Die Wiederholung belegt
+auch dort, dass die Punktzahl aus echten Eingaben stammt, aber nicht, dass der Spieler das Feld
+nicht schon kannte.
+
+Die Höchstpunktzahl je Spiel aus `shared/games.ts` bleibt als Fangnetz stehen, falls ein Spiel
+doch eine Lücke hat. Die eigentliche Prüfung ist die Wiederholung.
 
 ## Weitere Prüfungen beim Einreichen
 
@@ -110,9 +115,10 @@ Lücke hat. Die eigentliche Prüfung ist die Wiederholung.
 - Die nachgespielte Dauer passt in die Zeit seit Ausgabe des Tokens
 - Die Punktzahl liegt unter `LIMITS[game].maxScore`
 
-Der Token wird erst **nach** allen Prüfungen eingelöst — ein abgelehnter Name soll den Lauf
-nicht verbrennen. Zwei gleichzeitige Abgaben fängt das bedingte
-`UPDATE … WHERE used_at IS NULL` ab.
+Der Token wird nach der Namensprüfung und **vor** dem Nachspielen eingelöst. Ein abgelehnter
+Name verbrennt den Lauf nicht, ein abgelehnter Lauf dagegen schon; sonst ließe sich mit einem
+einzigen Token die Wiederholung beliebig oft anstoßen, bis das Rate-Limit greift. Zwei
+gleichzeitige Abgaben fängt das bedingte `UPDATE … WHERE used_at IS NULL` ab.
 
 Die Meldungen sind kurz und deutsch, weil das Frontend sie unverändert anzeigt:
 `Sitzung unbekannt`, `Sitzung schon eingetragen`, `Sitzung abgelaufen`,
@@ -122,18 +128,17 @@ Die Meldungen sind kurz und deutsch, weil das Frontend sie unverändert anzeigt:
 ## Namen
 
 `normalizeName` aus `shared/scores.ts` (NFC, Mehrfach-Leerzeichen zusammenziehen, trimmen),
-danach Länge 2 bis 16 und das Muster `NAME_RE` — Buchstaben jeder Sprache, Ziffern, Leerzeichen,
+danach Länge 2 bis 16 und das Muster `NAME_RE`: Buchstaben jeder Sprache, Ziffern, Leerzeichen,
 Punkt, Unterstrich, Bindestrich. Der Wortfilter prüft eine reduzierte Form: kleingeschrieben,
 Leetspeak zurückgesetzt, alle Nicht-Buchstaben entfernt. Das fängt `H1tl3r` und `f u c k`. Es
 ist eine Anstandsprüfung, keine Moderation.
 
 ## Grenzwerte nachziehen
 
-`LIMITS` in `shared/games.ts` ist großzügig über dem realistischen Rekord angesetzt und dient
-seit der Umstellung auf das Nachspielen nur noch als Fangnetz. Nach ein paar Wochen echten
-Betriebs lassen sich die Werte anhand der Daten nachziehen:
+`LIMITS` in `shared/games.ts` enthält nur `maxScore`, großzügig über dem realistischen Rekord
+angesetzt, und dient seit der Umstellung auf das Nachspielen nur noch als Fangnetz. Nach ein paar
+Wochen echten Betriebs lassen sich die Werte anhand der Daten nachziehen:
 
 ```sql
-SELECT game, MAX(score), MAX(CAST(score AS REAL) / (duration_ms / 1000.0))
-FROM scores GROUP BY game;
+SELECT game, MAX(score) FROM scores GROUP BY game;
 ```

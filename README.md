@@ -2,7 +2,7 @@
 
 # dmn_minigame
 
-**Zwölf Minispiele für den Bewusstlos-Bildschirm. Mit einer Bestenliste, die man nicht belügen kann.**
+**Zwölf einbettbare Minispiele. Die Punktzahl für die Bestenliste rechnet der Server aus, indem er jeden Lauf nachspielt.**
 
 [![Live spielen](https://img.shields.io/badge/live-minigames.dmn--software.com-FF6B00?style=for-the-badge&logo=gamejolt&logoColor=white)](https://minigames.dmn-software.com)
 
@@ -12,20 +12,21 @@
 [![Fastify](https://img.shields.io/badge/Fastify-000000?style=flat-square&logo=fastify&logoColor=white)](https://fastify.dev/)
 [![node:sqlite](https://img.shields.io/badge/node:sqlite-5FA04E?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/api/sqlite.html)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-![Lizenz](https://img.shields.io/badge/Lizenz-Quelle_einsehbar-lightgrey?style=flat-square)
+[![Lizenz: Alle Rechte vorbehalten](https://img.shields.io/badge/License-All_rights_reserved-lightgrey?style=flat-square)](LICENSE)
 
 </div>
 
 ---
 
-Zwölf Minispiele für die Zeit, in der man auf dem DMN-Server bewusstlos am Boden liegt und auf
-einen Sanitäter wartet. Läuft als eigenständige Website unter
-**[minigames.dmn-software.com](https://minigames.dmn-software.com)** und wird von
-`sky_ambulancejob` über diese Adresse in einem iframe eingebunden. Dieselbe Seite ist im normalen
+Eine eigenständige Seite mit zwölf Minispielen und einer globalen Bestenliste, gebaut zum
+Einbetten per iframe. Die Punktzahlen kommen nicht aus dem Browser, sondern aus einer
+serverseitigen Wiederholung jedes Laufs mit derselben Simulation. Läuft unter
+**[minigames.dmn-software.com](https://minigames.dmn-software.com)** und ist dort auch direkt im
 Browser spielbar.
 
-> **Quelle einsehbar, Nutzung untersagt.** Dieses Repository ist öffentlich, damit man den Code
-> lesen kann, nicht damit man ihn benutzt. Siehe [LICENSE](LICENSE). Es ist kein
+> **Alle Rechte vorbehalten.** Dieses Repository ist öffentlich, damit man den Code lesen kann.
+> Mögliche Arbeit- oder Auftraggeber dürfen ihn zur Prüfung herunterladen und lokal ausführen,
+> jede andere Nutzung ist ausgeschlossen. Siehe [LICENSE](LICENSE). Es ist kein
 > Open-Source-Projekt: kein Support, keine Beiträge.
 
 ## Der interessante Teil: die Punktzahl entsteht auf dem Server
@@ -59,13 +60,23 @@ Spielcode ein paar harte Regeln, nachzulesen in [docs/10_RAHMEN.md](docs/10_RAHM
 
 Der Rest ist Absicherung drumherum: das Log wird vor dem Nachspielen validiert (Länge durch drei
 teilbar, Ticks streng monoton, Wertebereiche, `MAX_LOG` = 120 000), der Lauf bricht nach 30 Minuten
-Spielzeit ab, `LIMITS` pro Spiel fängt Ausreißer ab, und die Session wird in einer Transaktion
-atomar verbraucht (`UPDATE … WHERE token = ? AND used_at IS NULL`), damit dasselbe Token auch bei
-gleichzeitigen Requests nur einmal zählt.
+Spielzeit ab, die nachgespielte Dauer muss in die Zeit seit Ausgabe des Tokens passen, eine
+Höchstpunktzahl je Spiel (`LIMITS`) fängt Ausreißer ab, und die Session wird vor dem Nachspielen
+atomar verbraucht (`UPDATE … WHERE token = ? AND used_at IS NULL`). Dasselbe Token zählt so auch
+bei gleichzeitigen Requests nur einmal, und ein abgelehnter Lauf lässt sich nicht beliebig oft
+nachspielen.
 
 Was bleibt: wer einen Bot schreibt, der die Spiele wirklich gut spielt, kommt in die Liste. Dagegen
-hilft nur der Löschendpunkt. Das steht so auch in [docs/20_API.md](docs/20_API.md): die Grenzen des
-Verfahrens sind dokumentiert, nicht weggelassen.
+hilft nur der Löschendpunkt.
+
+Bei Spielen mit verdeckter Information kommt eine zweite Grenze dazu. Der Seed geht an den Client,
+sonst könnte der Browser nicht dieselbe Simulation rechnen. Ein Bot kann damit bei Memoria die
+Kartenlage, bei Minefinder die Minen und bei Sim Says die ganze Folge vorab ausrechnen. Das
+Nachspielen garantiert weiter, dass die Punktzahl zu echten Eingaben passt. Dass der Spieler das
+Feld nicht schon kannte, lässt sich bei diesen drei Spielen aber nicht beweisen.
+
+Das steht so auch in [docs/20_API.md](docs/20_API.md): die Grenzen des Verfahrens sind
+dokumentiert, nicht weggelassen.
 
 ## Die Spiele
 
@@ -103,9 +114,9 @@ Mehrere davon sind eingetragene Marken.
 ## Aufbau
 
 ```
-shared/     spiellogik, typvertrag und grenzwerte, von web und api gemeinsam benutzt   1768 Zeilen
-web/        vite + react + typescript, zeichnet die spiele und die oberflaeche         2123 Zeilen
-api/        fastify + node:sqlite, die globale bestenliste                              328 Zeilen
+shared/     spiellogik, typvertrag und grenzwerte, von web und api gemeinsam benutzt   rund 1700 Zeilen
+web/        vite + react + typescript, zeichnet die spiele und die oberflaeche         rund 2100 Zeilen
+api/        fastify + node:sqlite, die globale bestenliste                              rund 300 Zeilen
 deploy/     dockerfiles, compose, caddy-block, deploy-anleitung
 docs/       vertrag je subsystem
 ```
@@ -144,12 +155,22 @@ Details: [docs/20_API.md](docs/20_API.md).
 
 ## Entwickeln
 
+Lokal ausführen ist zur Prüfung ausdrücklich erlaubt, siehe [LICENSE](LICENSE).
+
 ```sh
 cd api && npm install
 IP_SALT=$(openssl rand -hex 32) ADMIN_TOKEN=$(openssl rand -hex 32) DB_PATH=./data/dev.db node src/index.ts
 
+cd api && npm test
+
 cd web && npm install && npm run dev
 ```
+
+`npm test` spielt jedes der zwölf Spiele mit festen Seeds und festen Eingaben durch, schickt das
+Protokoll durch denselben `replay()` wie der Server und vergleicht Punktzahl und Tickzahl. Für je
+einen Seed pro Spiel sind beide Werte fest eingetragen; rechnet eine Simulation nicht bitgleich,
+schlägt der Test fehl. Er läuft mit `node:test` aus der Standardbibliothek, ohne zusätzliche
+Abhängigkeit.
 
 Der Vite-Dev-Server leitet `/api` auf `127.0.0.1:8090` weiter. Ohne laufende API funktionieren alle
 Spiele, nur die Bestenliste bleibt leer.
@@ -157,7 +178,7 @@ Spiele, nur die Bestenliste bleibt leer.
 Einbettung prüfen: `http://localhost:5173/test-iframe.html`
 
 Die CI (`.github/workflows/pruefung.yml`) läuft auf Node 24 und prüft bei jedem Push auf `main` und
-jedem Pull Request den Typecheck beider Pakete sowie den Vite-Build.
+jedem Pull Request den Typecheck beider Pakete, den Vite-Build und den Replay-Test.
 
 ## URL-Parameter
 
@@ -176,8 +197,9 @@ Beispiel für die Einbindung:
 https://minigames.dmn-software.com/?kiosk=1&game=snake&name=Max%20Mustermann&board=0
 ```
 
-Was die einbettende Seite tun muss, steht in [docs/40_EINBETTUNG.md](docs/40_EINBETTUNG.md). Kurz
-gefasst: NUI-Fokus halten, solange das iframe sichtbar ist.
+Was die einbettende Seite tun muss, steht in [docs/40_EINBETTUNG.md](docs/40_EINBETTUNG.md). Das
+gilt auch für einen Spiel-Client wie FiveM, der die Seite als NUI-iframe zeigt: Er muss den
+Eingabefokus halten, solange das iframe sichtbar ist.
 
 ## Betrieb
 

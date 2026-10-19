@@ -9,7 +9,7 @@ Projekt veröffentlicht deshalb **keine** eigenen Ports, sondern hängt nur im g
 Wichtig: Die Dienste heißen `minigames-web` und `minigames-api`, nicht `web` und `api`.
 Compose vergibt den Dienstnamen immer zusätzlich als Netz-Alias; kurze Namen stünden im
 gemeinsamen Netz doppelt, weil der fremde Stack sie dort schon führt, und das Docker-DNS
-löste sie nichtdeterministisch auf — im schlechten Fall landet fremder Verkehr hier.
+löste sie nichtdeterministisch auf. Im schlechten Fall landet fremder Verkehr hier.
 
 ## Platzhalter
 
@@ -78,7 +78,7 @@ Beide Container müssen `healthy` melden, bevor es weitergeht.
 
 ### 6. Caddy ans Netz hängen
 
-`docker network connect` wirkt auf den laufenden Container, ohne ihn neu zu starten —
+`docker network connect` wirkt auf den laufenden Container, ohne ihn neu zu starten,
 der fremde Stack bleibt dabei online:
 
 ```sh
@@ -95,7 +95,7 @@ docker exec $PROXY wget -qO- http://minigames-api:8090/api/v1/health
 docker exec $PROXY wget -qO- -S http://minigames-web:8080/ >/dev/null
 ```
 
-Gleichzeitig gegenprüfen, dass der fremde Stack seine eigenen Dienste weiterhin trifft — hier
+Gleichzeitig gegenprüfen, dass der fremde Stack seine eigenen Dienste weiterhin trifft, hier
 ein Dienst, den er auf seinem eigenen Netz führt:
 
 ```sh
@@ -159,7 +159,7 @@ networks:
     external: true
 ```
 
-Diese Änderung nur beim nächsten ohnehin geplanten Wartungsfenster ausrollen — sie wird
+Diese Änderung nur beim nächsten ohnehin geplanten Wartungsfenster ausrollen. Sie wird
 erst mit einem Recreate des Caddy-Containers wirksam und kostet dabei kurz Downtime für
 alle Domains.
 
@@ -175,6 +175,10 @@ docker compose ps
 
 Der Caddyfile-Block bleibt dabei unberührt, die Aliase ändern sich nicht. Alte Images
 gelegentlich aufräumen: `docker image prune -f`.
+
+Die Basis-Images sind in den Dockerfiles per Digest festgelegt. Neue Node- oder Caddy-Versionen
+kommen deshalb erst an, wenn der Digest dort nachgezogen wird; den aktuellen liefert
+`docker buildx imagetools inspect node:24-alpine` bzw. `caddy:2-alpine`.
 
 ## Zurückrollen
 

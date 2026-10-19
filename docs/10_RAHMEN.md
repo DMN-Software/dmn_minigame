@@ -1,7 +1,7 @@
 # Rahmen
 
 Jedes Spiel ist zweigeteilt: die Logik liegt als reine Simulation in `shared/games/`, das
-Zeichnen in `web/src/games/`. Der Grund steht in [20_API.md](20_API.md) — der Server spielt
+Zeichnen in `web/src/games/`. Der Grund steht in [20_API.md](20_API.md): Der Server spielt
 jeden Lauf mit derselben Logik nach und rechnet die Punktzahl selbst aus. Alles, was der
 Browser allein weiß, zählt nicht.
 
@@ -38,7 +38,7 @@ Zielposition in Tausendsteln der Spielfeldbreite.
 Der Server rechnet denselben Lauf noch einmal. Weicht auch nur ein Wert ab, scheitert die
 Wiederholung und der Spieler verliert seinen Eintrag. In `shared/games/` gilt deshalb:
 
-- Zufall ausschließlich über den übergebenen `rng` — `makeRng` ist ein mulberry32 aus
+- Zufall ausschließlich über den übergebenen `rng`. `makeRng` ist ein mulberry32 aus
   Ganzzahloperationen und einer Division, also überall gleich.
 - Keine Uhrzeit. Zeit wird in Ticks gezählt, 60 sind eine Sekunde. Aus einer Wartezeit von
   700 ms werden 42 Ticks.
@@ -89,7 +89,7 @@ aus `shared/games.ts`.
 ## Pause und Ende
 
 Der Host pausiert bei `blur`, bei `visibilitychange` auf versteckt, bei Escape und bei `P`.
-Fortgesetzt wird immer ausdrücklich per Klick, nie automatisch bei `focus` — sonst läuft das
+Fortgesetzt wird immer ausdrücklich per Klick, nie automatisch bei `focus`, sonst läuft das
 Spiel weiter, während der Spieler noch woanders klickt. Beim Pausieren verwirft der Treiber
 die aufgelaufene Zeit, sonst holt die Simulation alle verpassten Ticks auf einmal nach.
 
@@ -99,13 +99,15 @@ stillhalten.
 
 ## Neues Spiel hinzufügen
 
-1. Eintrag in `shared/games.ts` unter `GAMES` und ein Grenzwertpaar in `LIMITS`
+1. Eintrag in `shared/games.ts` unter `GAMES` und eine Höchstpunktzahl in `LIMITS`
 2. Simulation unter `shared/games/<id>.ts`, Fabrik in `shared/registry.ts` eintragen
 3. Renderer unter `web/src/games/<id>/`, Loader in `web/src/shell/registry.ts`
 
 Der Loader ist ein dynamisches `import()`, damit nicht alle zwölf Spiele im Startbündel
 landen. Das Menü stößt ihn schon beim Überfahren der Kachel an.
 
-Vor dem Abgeben prüfen, dass Direktlauf und Wiederholung dasselbe Ergebnis liefern — ein
-Skript, das die Simulation tickt, das entstandene Protokoll durch `replay()` schickt und
-Punktzahl und Tickzahl vergleicht, findet jede Verletzung der Regeln oben sofort.
+Vor dem Abgeben prüfen, dass Direktlauf und Wiederholung dasselbe Ergebnis liefern. Das macht
+`npm test` in `api/`: `test/replay.test.ts` tickt jede Simulation mit festen Eingaben, schickt
+das entstandene Protokoll durch `replay()` und vergleicht Punktzahl und Tickzahl. Das findet jede
+Verletzung der Regeln oben sofort. Ein neues Spiel braucht dort einen Eintrag in `PINNED` und,
+falls es den `pick`-Kanal benutzt, in `PICKS`.
